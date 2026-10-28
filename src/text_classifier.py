@@ -38,8 +38,9 @@ class TextRiskClassifier:
             show_progress_bar=len(texts) > 100,
         )
 
-    def fit(self, texts: list[str], labels: list[int]) -> "TextRiskClassifier":
-        self.clf.fit(self.embed(texts), labels)
+    def fit(self, texts: list[str], labels: list[int], sample_weight=None) -> "TextRiskClassifier":
+        """sample_weight (optionnel) : importance de chaque exemple (ex. corrections des modérateurs)."""
+        self.clf.fit(self.embed(texts), labels, sample_weight=sample_weight)
         return self
 
     def predict_proba(self, texts: list[str]) -> np.ndarray:

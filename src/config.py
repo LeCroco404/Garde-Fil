@@ -7,7 +7,9 @@ from pathlib import Path
 # --- Chemins (calculés depuis ce fichier : le projet marche quel que soit le dossier courant) ---
 ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT / "data"
+VIDEOS_DIR = DATA_DIR / "videos"         # vidéos à analyser
 PROCESSED_DIR = DATA_DIR / "processed"   # audio extrait + résultats d'analyse (jamais versionnés)
+FEEDBACK_DIR = DATA_DIR / "feedback"     # revues des modérateurs (jamais versionnées)
 MODELS_DIR = ROOT / "models"             # classifieurs entraînés (jamais versionnés)
 
 # --- Transcription (faster-whisper) ---
@@ -54,3 +56,9 @@ ACTIONS = {
     "modéré": f"Revue standard. Si le risque est confirmé, proposer les ressources d'aide : {HELP_RESOURCE}.",
     "faible": "Aucune action recommandée.",
 }
+
+# --- Revue humaine & réapprentissage (phase 4) ---
+REVIEWS_PATH = FEEDBACK_DIR / "reviews.jsonl"   # journal des revues : une ligne JSON par revue
+FEEDBACK_WEIGHT = 3.0      # un exemple corrigé par un modérateur pèse 3x un exemple du jeu public
+MAX_F1_DROP = 0.01         # garde-fou : on refuse un nouveau modèle qui perd plus de 0.01 de F1
+TEXT_CLF_BACKUP_PATH = MODELS_DIR / "text_clf.prev.joblib"

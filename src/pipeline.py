@@ -1,7 +1,7 @@
-"""Garde-Fil : pipeline phase 2 (parole + texte à l'écran).
+"""Garde-Fil : pipeline phase 3 (parole + écran -> fusion -> décision expliquée).
 
 vidéo -> audio (ffmpeg) -> segments parlés (Whisper)  ┐
-      -> images 1/s (ffmpeg) -> segments écran (OCR)  ┴-> score par segment (classifieur)
+      -> images 1/s (ffmpeg) -> segments écran (OCR)  ┴-> score par segment -> fusion -> rapport
 
 Usage (depuis la racine du projet, venv actif) :
     python -m src.pipeline data/videos/test_01.mp4
@@ -12,16 +12,12 @@ from pathlib import Path
 
 from src.config import ALERT_THRESHOLD, FRAME_FPS, PROCESSED_DIR, TEXT_CLF_PATH
 from src.extract import extract_audio, extract_frames
+from src.fusion import fmt_ts, fuse
 from src.ocr import ocr_frames
 from src.text_classifier import TextRiskClassifier
 from src.transcribe import transcribe
 
 SOURCE_LABELS = {"parole": "parole", "ecran": "écran "}
-
-
-def fmt_ts(seconds: float) -> str:
-    """12.4 -> '0:12' (format lisible par le modérateur)."""
-    return f"{int(seconds) // 60}:{int(seconds) % 60:02d}"
 
 
 def analyze_video(video_path: Path, model: TextRiskClassifier) -> dict:
@@ -40,22 +36,19 @@ def analyze_video(video_path: Path, model: TextRiskClassifier) -> dict:
     for s in screen:
         s["source"] = "ecran"
 
-    # 3. Les deux sources ont le même format : on les classe ensemble, dans l'ordre chronologique
+    # 3. Score de chaque segment, toutes sources confondues, dans l'ordre chronologique
     segments = sorted(speech + screen, key=lambda s: (s["start"], s["source"]))
     scores = model.predict_proba([s["text"] for s in segments])
     for seg, score in zip(segments, scores):
         seg["score"] = round(float(score), 3)
         seg["flagged"] = bool(score >= ALERT_THRESHOLD)
 
-    # 4. Agrégation par le MAXIMUM (la fusion pondérée arrivera en phase 3)
-    top = max(segments, key=lambda s: s["score"], default=None)
+    # 4. Fusion -> score global, niveau, raisons, action recommandée
     result = {
         "video": video_path.name,
         "has_audio": audio is not None,
         "n_frames": len(frames),
-        "text_score": top["score"] if top else 0.0,
-        "flagged": bool(top and top["flagged"]),
-        "top_segment": top,
+        "risk": fuse(segments),
         "segments": segments,
     }
 
@@ -65,25 +58,32 @@ def analyze_video(video_path: Path, model: TextRiskClassifier) -> dict:
 
 
 def print_report(result: dict) -> None:
+    risk = result["risk"]
     print(f"\n=== {result['video']} ({result['n_frames']} images analysées) ===")
     if not result["has_audio"]:
         print("(aucune piste audio)")
     if not result["segments"]:
         print("Aucun texte détecté (ni parole, ni écran).")
+
+    # Détail des segments (vue technique)
     for s in result["segments"]:
         mark = "⚠️ " if s["flagged"] else "   "
         print(f"{mark}[{fmt_ts(s['start'])}-{fmt_ts(s['end'])}] {SOURCE_LABELS[s['source']]} "
               f"{s['score']:.2f}  {s['text']}")
-    verdict = "À REVOIR par un modérateur" if result["flagged"] else "Rien à signaler"
-    print(f"\nScore texte : {result['text_score']:.2f} -> {verdict}")
-    if result["flagged"]:
-        top = result["top_segment"]
-        where = "dit" if top["source"] == "parole" else "affiché à l'écran"
-        print(f"Passage {where} à {fmt_ts(top['start'])}")
+
+    # Décision expliquée (vue modérateur)
+    print(f"\nScore global : {risk['score']:.2f} | niveau : {risk['level'].upper()}")
+    if risk["reasons"]:
+        print("Pourquoi :")
+        for reason in risk["reasons"]:
+            print(f"  - {reason}")
+    print(f"Action recommandée : {risk['action']}")
+    # Le système signale et explique ; seul un humain décide
+    print("Décision finale : modérateur humain." if risk["flagged"] else "Non transmise au modérateur.")
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Garde-Fil : analyse parole + texte à l'écran")
+    parser = argparse.ArgumentParser(description="Garde-Fil : analyse et score de risque expliqué")
     parser.add_argument("videos", nargs="+", type=Path)
     args = parser.parse_args()
 

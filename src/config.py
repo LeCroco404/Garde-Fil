@@ -34,3 +34,23 @@ OCR_LANG = "fra"       # pack de langue Tesseract
 OCR_PSM = 11           # mode « texte épars » : adapté aux incrustations dispersées sur l'image
 OCR_MIN_CONF = 60      # on ignore les mots reconnus avec une confiance < 60 % (bruit, faux texte)
 OCR_SIMILARITY = 0.8   # deux images consécutives au texte similaire à 80 % = même incrustation
+
+# --- Fusion & décision (phase 3) ---
+# Valeurs fixées à la main pour l'instant (règles explicables) ; calibrées en phase 6.
+MOMENT_GAP = 1.0           # deux passages signalés à moins d'1 s d'écart = un même « moment »
+CONVERGENCE_BONUS = 0.10   # le même moment est signalé dans la parole ET à l'écran
+RECURRENCE_BONUS = 0.05    # par moment signalé supplémentaire dans la vidéo...
+RECURRENCE_MAX = 0.10      # ...plafonné à +0.10
+HIGH_THRESHOLD = 0.75      # au-delà : revue prioritaire
+
+# Ressource d'aide vers laquelle orienter (sujet voisin : cyberharcèlement).
+# Lors de la transposition au vrai sujet, ce sera le 3114 (prévention du suicide).
+HELP_RESOURCE = "3018 (cyberharcèlement)"
+
+# Action recommandée au modérateur selon le niveau. Le système ne supprime jamais rien.
+ACTIONS = {
+    "élevé": "Revue prioritaire. Si le risque est confirmé, privilégier un message d'orientation "
+             f"vers le {HELP_RESOURCE} plutôt qu'un simple blocage.",
+    "modéré": f"Revue standard. Si le risque est confirmé, proposer les ressources d'aide : {HELP_RESOURCE}.",
+    "faible": "Aucune action recommandée.",
+}

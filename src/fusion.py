@@ -7,9 +7,12 @@ Le modérateur doit pouvoir comprendre POURQUOI une vidéo lui est présentée.
 2. Score d'un moment : le pire passage, + bonus si plusieurs sources (parole, écran, image) convergent.
 3. Score global : le pire moment, + bonus si plusieurs moments distincts (récurrence).
 4. Niveau (faible / modéré / élevé) -> action recommandée + raisons horodatées.
+5. Si seule l'image (non calibrée) signale un risque, le niveau est plafonné (IMAGE_ONLY_MAX_LEVEL).
 """
 from src.config import (ACTIONS, ALERT_THRESHOLD, CONVERGENCE_BONUS, HIGH_THRESHOLD,
-                        MOMENT_GAP, RECURRENCE_BONUS, RECURRENCE_MAX)
+                        IMAGE_ONLY_MAX_LEVEL, MOMENT_GAP, RECURRENCE_BONUS, RECURRENCE_MAX)
+
+LEVELS = ["faible", "modéré", "élevé"]  # du moins au plus urgent
 
 
 def fmt_ts(seconds: float) -> str:
@@ -90,6 +93,14 @@ def fuse(segments: list[dict]) -> dict:
         reasons = []
 
     level = level_of(score)
+
+    # Plafond « image seule » : le score est conservé (transparence), seul le niveau est limité
+    image_only = bool(moments) and all(m["sources"] == ["image"] for m in moments)
+    if image_only and LEVELS.index(level) > LEVELS.index(IMAGE_ONLY_MAX_LEVEL):
+        level = IMAGE_ONLY_MAX_LEVEL
+        reasons.append(f"Niveau plafonné à {level.upper()} : seule l'image signale un risque "
+                       "(source non calibrée, aucune parole ni texte à l'écran ne le confirme)")
+
     return {
         "score": round(score, 3),
         "level": level,

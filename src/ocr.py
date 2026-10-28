@@ -47,8 +47,9 @@ def ocr_frame(image_path: Path) -> tuple[str, float]:
 
 
 def _is_meaningful(text: str) -> bool:
-    """Au moins 3 lettres : en dessous, c'est presque toujours du bruit d'OCR."""
-    return len(re.findall(r"[^\W\d_]", text)) >= 3
+    """Au moins un mot de 3 lettres ou plus : sinon, c'est presque toujours du bruit d'OCR
+    (textures, cordes, logos lus comme « À à | BE À »)."""
+    return re.search(r"[^\W\d_]{3,}", text) is not None
 
 
 def _similar(a: str, b: str) -> bool:

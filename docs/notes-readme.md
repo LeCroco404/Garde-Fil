@@ -32,3 +32,11 @@ Constats chiffrés relevés pendant le développement. Chaque phase ajoute les s
 3. OCR sélectif : une seule image lue sur quatre quand le texte est fixe. Critère de changement robuste aux textes courts (le premier critère, par écart moyen, les ratait).
 4. Benchmark Whisper sur 30 s d'audio : base RTF 0,11, small RTF 0,27. Choix de small : base a transcrit « ferme-la et dégage » en « ferme l'aédégage », perdant le mot le plus agressif. Le rappel prime sur quelques secondes de calcul en file de modération.
 5. Biais de mesure identifié : temps de chargement non comparables (premier lancement), d'où la nécessité d'un échauffement dans un benchmark rigoureux.
+
+## Phase 5b : analyse d'image (CLIP zero-shot)
+
+1. Sans aucun entraînement : photo de repas 0,00 ; dispute 0,91 (« geste menaçant ») ; vidéo toxique sur fond uni 0,00 à l'image (la détection reste portée par la parole).
+2. Faux positif attendu : match de boxe 0,96 (« bagarre »). CLIP détecte le contenu, pas l'intention ni le contexte : même limite que la vidéo de prévention côté texte.
+3. Règle ajoutée : une source image seule (non calibrée) plafonne au niveau MODÉRÉ ; le niveau ÉLEVÉ exige la convergence d'une source texte. Le score est conservé et le plafond est expliqué au modérateur.
+4. Bruit d'OCR sur photo réelle (« À à | BE À », cordes du ring) : filtre durci, au moins un mot de 3 lettres.
+5. Points éthiques : descriptions neutres indispensables (score relatif) ; biais hérités du web (risque d'associer « agressivité » à certaines apparences) à mesurer par groupe avant tout usage réel ; descriptions du vrai sujet à définir avec des cliniciens, jamais rédigées dans le projet.

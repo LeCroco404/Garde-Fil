@@ -75,6 +75,9 @@ EMB_CACHE_PATH = MODELS_DIR / "embeddings_cache.joblib"  # cache des embeddings 
 ENABLE_VISION = True               # désactivable : python -m src.pipeline --no-vision ...
 VISION_MODEL = "clip-ViT-B-32"     # CLIP via sentence-transformers (~600 Mo)
 VISION_ALERT_THRESHOLD = 0.6       # plus strict que le texte : le zero-shot n'est pas calibré
+# Une source non calibrée ne doit pas déclencher seule une revue prioritaire :
+# si SEULE l'image signale un risque (aucune parole ni texte à l'écran), le niveau est plafonné.
+IMAGE_ONLY_MAX_LEVEL = "modéré"
 
 # Descriptions comparées à chaque image (zero-shot) : (texte pour CLIP, libellé pour l'explication, à risque ?)
 # CLIP a été entraîné en anglais : les descriptions sont en anglais, les libellés en français.

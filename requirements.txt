@@ -1,0 +1,16 @@
+# --- Transcription ---
+faster-whisper>=1.0          # Whisper optimisé CPU (int8)
+
+# --- OCR ---
+pytesseract>=0.3.10          # interface Python vers le binaire tesseract
+Pillow>=10.0                 # manipulation d'images
+
+# --- NLP / classification ---
+sentence-transformers>=3.0   # embeddings sémantiques (installe aussi torch)
+scikit-learn>=1.4            # classifieur léger sur embeddings + métriques
+datasets>=2.19               # jeux de données publics Hugging Face
+pandas>=2.2
+
+# --- Interface & config ---
+streamlit>=1.35
+pyyaml>=6.0

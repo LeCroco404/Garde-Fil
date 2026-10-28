@@ -43,6 +43,10 @@ def feedback_examples() -> tuple[list[str], list[int], int]:
     model_said: dict[str, int] = {}
     for review in latest_reviews_by_video().values():
         for seg in review["segments"]:
+            # Seuls les passages TEXTE entraînent le classifieur de texte. Les étiquettes « image »
+            # restent dans le journal : elles serviront à évaluer et ajuster les descriptions CLIP.
+            if seg["source"] == "image":
+                continue
             labels[seg["text"]] = seg["human_label"]
             model_said[seg["text"]] = int(seg["model_flagged"])
     disagreements = sum(labels[t] != model_said[t] for t in labels)

@@ -3,8 +3,8 @@
 Principe : des règles simples et lisibles plutôt qu'une « boîte noire ».
 Le modérateur doit pouvoir comprendre POURQUOI une vidéo lui est présentée.
 
-1. Moments : les passages signalés (parole ou écran) proches dans le temps sont regroupés.
-2. Score d'un moment : le pire passage, + bonus si parole ET écran convergent.
+1. Moments : les passages signalés (parole, écran ou image) proches dans le temps sont regroupés.
+2. Score d'un moment : le pire passage, + bonus si plusieurs sources (parole, écran, image) convergent.
 3. Score global : le pire moment, + bonus si plusieurs moments distincts (récurrence).
 4. Niveau (faible / modéré / élevé) -> action recommandée + raisons horodatées.
 """
@@ -54,19 +54,25 @@ def level_of(score: float) -> str:
     return "modéré" if score >= ALERT_THRESHOLD else "faible"
 
 
+SOURCE_ORDER = ["parole", "ecran", "image"]
+SOURCE_WORDS = {"parole": "dit", "ecran": "affiché à l'écran", "image": "visible à l'image"}
+SOURCE_NAMES = {"parole": "parole", "ecran": "écran", "image": "image"}
+
+
 def _describe(moment: dict) -> str:
-    """Une raison lisible : quand, où (parole / écran), quel score, quel extrait."""
-    where = {("parole",): "dit", ("ecran",): "affiché à l'écran"}.get(
-        tuple(moment["sources"]), "dit ET affiché à l'écran")
+    """Une raison lisible : quand, où (parole / écran / image), quel score, quel extrait."""
+    sources = sorted(moment["sources"], key=SOURCE_ORDER.index)
+    where = " ET ".join(SOURCE_WORDS[s] for s in sources)
     line = (f"{fmt_ts(moment['start'])}-{fmt_ts(moment['end'])} : passage {where} "
             f"(score {moment['score']:.2f}) « {_excerpt(moment['top']['text'])} »")
     if moment["converging"]:
-        line += f" [convergence parole + écran : +{CONVERGENCE_BONUS:.2f}]"
+        names = " + ".join(SOURCE_NAMES[s] for s in sources)
+        line += f" [convergence {names} : +{CONVERGENCE_BONUS:.2f}]"
     return line
 
 
 def fuse(segments: list[dict]) -> dict:
-    """Produit la décision finale à partir des segments scorés (parole + écran)."""
+    """Produit la décision finale à partir des segments scorés (parole, écran, image)."""
     flagged = [s for s in segments if s["flagged"]]
     moments = [score_moment(m) for m in group_moments(flagged)]
 

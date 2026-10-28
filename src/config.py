@@ -70,3 +70,26 @@ OCR_WORKERS = 4              # images lues en parallèle par Tesseract (ton Mac 
 FRAME_CHANGE_PIXEL = 30
 FRAME_CHANGE_RATIO = 0.0005
 EMB_CACHE_PATH = MODELS_DIR / "embeddings_cache.joblib"  # cache des embeddings du jeu PUBLIC uniquement
+
+# --- Analyse d'image (phase 5b, optionnelle) ---
+ENABLE_VISION = True               # désactivable : python -m src.pipeline --no-vision ...
+VISION_MODEL = "clip-ViT-B-32"     # CLIP via sentence-transformers (~600 Mo)
+VISION_ALERT_THRESHOLD = 0.6       # plus strict que le texte : le zero-shot n'est pas calibré
+
+# Descriptions comparées à chaque image (zero-shot) : (texte pour CLIP, libellé pour l'explication, à risque ?)
+# CLIP a été entraîné en anglais : les descriptions sont en anglais, les libellés en français.
+# Sujet voisin : agressivité visuelle, décrite de façon générique. Les descriptions NEUTRES comptent
+# autant que les autres : le score est relatif (une image est « à risque » par rapport aux alternatives).
+# Pour le vrai sujet, ces descriptions seraient définies avec des cliniciens, pas rédigées ici.
+VISION_PROMPTS = [
+    ("a photo of people fighting", "une bagarre", True),
+    ("a photo of a person making a threatening gesture", "un geste menaçant", True),
+    ("a photo of a person shouting aggressively", "une personne qui crie avec agressivité", True),
+    ("a photo of food", "de la nourriture", False),
+    ("a photo of a person talking calmly to the camera", "une personne qui parle calmement", False),
+    ("a photo of people smiling together", "des personnes souriantes", False),
+    ("a photo of a landscape", "un paysage", False),
+    ("a photo of an animal", "un animal", False),
+    ("a plain colored background with text", "un fond uni avec du texte", False),
+    ("a screenshot of a video game", "une capture de jeu vidéo", False),
+]

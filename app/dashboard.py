@@ -24,7 +24,7 @@ st.set_page_config(page_title="Garde-Fil", page_icon="🛡️", layout="wide")
 
 LEVEL_ORDER = {"élevé": 0, "modéré": 1, "faible": 2}
 LEVEL_BADGE = {"élevé": "🔴 ÉLEVÉ", "modéré": "🟠 MODÉRÉ", "faible": "🟢 FAIBLE"}
-SOURCE_ICON = {"parole": "🗣️ parole", "ecran": "🖥️ écran"}
+SOURCE_ICON = {"parole": "🗣️ parole", "ecran": "🖥️ écran", "image": "🖼️ image"}
 LABELS = ["Sans risque", "À risque"]
 DECISIONS = ["Risque confirmé", "Pas de risque", "Escalade (cas complexe)"]
 

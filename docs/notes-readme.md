@@ -40,3 +40,15 @@ Constats chiffrés relevés pendant le développement. Chaque phase ajoute les s
 3. Règle ajoutée : une source image seule (non calibrée) plafonne au niveau MODÉRÉ ; le niveau ÉLEVÉ exige la convergence d'une source texte. Le score est conservé et le plafond est expliqué au modérateur.
 4. Bruit d'OCR sur photo réelle (« À à | BE À », cordes du ring) : filtre durci, au moins un mot de 3 lettres.
 5. Points éthiques : descriptions neutres indispensables (score relatif) ; biais hérités du web (risque d'associer « agressivité » à certaines apparences) à mesurer par groupe avant tout usage réel ; descriptions du vrai sujet à définir avec des cliniciens, jamais rédigées dans le projet.
+
+## Phase 6a : évaluation de bout en bout et calibrage
+
+1. Jeu de test vidéo synthétique versionné (`eval/cases.yaml`) : 23 cas en 8 catégories, dont 5 de prévention (y compris un témoignage de guérison) qui ne doivent pas être signalés. Indicateur clé : prévention signalée à tort.
+2. Analyse coûteuse mise en cache, décision rejouée : 11 seuils testés en quelques secondes.
+3. Première mesure (seuil 0,50) : précision 0,70, rappel 0,78, prévention signalée à tort 1/5. Le « meilleur compromis » calculé (seuil 0,65) supprimait les fausses alertes mais faisait perdre un vrai cas de harcèlement : refusé, car rater un contenu à risque est plus grave qu'une fausse alerte.
+4. Analyse de cause plutôt que réglage de seuil : la fausse alerte de prévention venait du titre « Chiffres clés » (2 mots, score 0,61), un fragment trop court pour être jugé sans contexte. Règle ajoutée : un texte de moins de 3 mots ne peut pas alerter seul. Contrepartie assumée : un titre d'un seul mot n'est plus détecté seul.
+5. Bug trouvé par l'évaluation : sans passage signalé, le score informatif pouvait quand même faire monter le niveau (contournement de la règle). Corrigé : seul un passage signalé peut élever le niveau.
+6. Résultat final (seuil 0,50 maintenu) : précision 0,78, rappel 0,78, F1 0,78, prévention signalée à tort 0/5, risque explicite 5/5, neutre 5/5, sans perte de rappel. Après correction, monter le seuil ne fait plus que perdre du rappel : la cause était bien structurelle.
+7. Généralisation des corrections du modérateur, sur des formulations d'exclusion jamais vues : +0,03 à +0,10 ; un cas (cantine) franchit le seuil uniquement grâce à la correction (0,43 → 0,53). Aucun effet collatéral sur la prévention (±0,04).
+8. Limites restantes, documentées : exclusion calme mal couverte (2/3 manqués, problème de données, pas de seuil) ; négativité confondue avec la toxicité (« cette journée est horrible », 0,50) ; boxe signalée par l'image (plafonnée à MODÉRÉ) ; jeu petit et synthétique, calibré et mesuré sur les mêmes cas, donc chiffres indicatifs.
+9. Bonus de fusion rendus proportionnels (part de la marge restante) : plus de saturation à 1,00 (0,94 + convergence = 0,97).

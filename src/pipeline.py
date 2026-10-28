@@ -16,7 +16,7 @@ from pathlib import Path
 
 from src.config import ALERT_THRESHOLD, ENABLE_VISION, FRAME_FPS, PROCESSED_DIR, TEXT_CLF_PATH, WHISPER_MODEL
 from src.extract import extract_audio, extract_frames
-from src.fusion import fmt_ts, fuse
+from src.fusion import fmt_ts, fuse, text_alert
 from src.ocr import ocr_frames
 from src.text_classifier import TextRiskClassifier
 from src.transcribe import _load_model as load_whisper
@@ -40,9 +40,10 @@ def warm_up(model: TextRiskClassifier, use_vision: bool = ENABLE_VISION) -> floa
     return round(time.perf_counter() - start, 2)
 
 
-def analyze_video(video_path: Path, model: TextRiskClassifier, use_vision: bool = ENABLE_VISION) -> dict:
+def analyze_video(video_path: Path, model: TextRiskClassifier, use_vision: bool = ENABLE_VISION,
+                  out_dir: Path = PROCESSED_DIR) -> dict:
     video_path = Path(video_path)
-    work_dir = PROCESSED_DIR / video_path.stem   # un dossier de travail par vidéo
+    work_dir = out_dir / video_path.stem   # un dossier de travail par vidéo (out_dir : autre racine pour l'évaluation)
 
     # Chronométrage de chaque étape : on optimise ce qu'on a mesuré, pas ce qu'on suppose
     timings: dict[str, float] = {}
@@ -75,7 +76,8 @@ def analyze_video(video_path: Path, model: TextRiskClassifier, use_vision: bool 
         scores = model.predict_proba([s["text"] for s in text_segments])
     for seg, score in zip(text_segments, scores):
         seg["score"] = round(float(score), 3)
-        seg["flagged"] = bool(score >= ALERT_THRESHOLD)
+        seg["flagged"] = text_alert(seg["text"], seg["score"])
+        seg["too_short"] = seg["score"] >= ALERT_THRESHOLD and not seg["flagged"]  # transparence
 
     # 3b. Image (optionnel) : CLIP produit directement des segments déjà scorés
     visual, vision_frames, n_vision = [], [], 0
@@ -119,8 +121,9 @@ def print_report(result: dict) -> None:
     # Détail des segments (vue technique)
     for s in result["segments"]:
         mark = "⚠️ " if s["flagged"] else "   "
+        note = "  (trop court pour alerter seul)" if s.get("too_short") else ""
         print(f"{mark}[{fmt_ts(s['start'])}-{fmt_ts(s['end'])}] {SOURCE_LABELS[s['source']]} "
-              f"{s['score']:.2f}  {s['text']}")
+              f"{s['score']:.2f}  {s['text']}{note}")
 
     # Décision expliquée (vue modérateur)
     print(f"\nScore global : {risk['score']:.2f} | niveau : {risk['level'].upper()}")

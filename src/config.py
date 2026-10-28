@@ -27,8 +27,14 @@ TEXT_METRICS_PATH = MODELS_DIR / "text_metrics.json"
 DATASET_NAME = "textdetox/multilingual_toxicity_dataset"
 DATASET_SPLIT = "fr"
 
-# Score à partir duquel un passage est signalé au modérateur (affiné en phase 6)
+# Score à partir duquel un passage est signalé au modérateur.
+# Phase 6a : 0,5 conservé. Monter le seuil retirait des fausses alertes au prix d'un vrai cas manqué ;
+# on a préféré corriger la cause des fausses alertes (textes trop courts, voir ci-dessous).
 ALERT_THRESHOLD = 0.5
+
+# Un texte de moins de 3 mots ne peut pas déclencher une alerte à lui seul : sans contexte,
+# le classifieur (entraîné sur des phrases) répond de façon peu fiable (ex. « Chiffres clés » : 0,61).
+MIN_WORDS_TO_FLAG = 3
 
 # --- Images & OCR (texte incrusté) ---
 FRAME_FPS = 1          # 1 image par seconde : suffit pour un texte qui reste affiché ~1 s ou plus
@@ -37,13 +43,13 @@ OCR_PSM = 11           # mode « texte épars » : adapté aux incrustations dis
 OCR_MIN_CONF = 60      # on ignore les mots reconnus avec une confiance < 60 % (bruit, faux texte)
 OCR_SIMILARITY = 0.8   # deux images consécutives au texte similaire à 80 % = même incrustation
 
-# --- Fusion & décision (phase 3) ---
-# Valeurs fixées à la main pour l'instant (règles explicables) ; calibrées en phase 6.
-MOMENT_GAP = 1.0           # deux passages signalés à moins d'1 s d'écart = un même « moment »
-CONVERGENCE_BONUS = 0.10   # le même moment est signalé dans la parole ET à l'écran
-RECURRENCE_BONUS = 0.05    # par moment signalé supplémentaire dans la vidéo...
-RECURRENCE_MAX = 0.10      # ...plafonné à +0.10
-HIGH_THRESHOLD = 0.75      # au-delà : revue prioritaire
+# --- Fusion & décision (phase 3, bonus rendus proportionnels en phase 6a) ---
+# Un bonus comble une PART de la marge restante jusqu'à 1 (0,94 -> 0,97) : plus de saturation à 1,00.
+MOMENT_GAP = 1.0             # deux passages signalés à moins d'1 s d'écart = un même « moment »
+CONVERGENCE_SHARE = 0.5      # plusieurs sources signalent le même moment : comble 50 % de la marge
+RECURRENCE_SHARE = 0.15      # par moment signalé supplémentaire dans la vidéo...
+RECURRENCE_MAX_SHARE = 0.30  # ...plafonné à 30 % de la marge
+HIGH_THRESHOLD = 0.75        # au-delà : revue prioritaire
 
 # Ressource d'aide vers laquelle orienter (sujet voisin : cyberharcèlement).
 # Lors de la transposition au vrai sujet, ce sera le 3114 (prévention du suicide).
@@ -96,3 +102,8 @@ VISION_PROMPTS = [
     ("a plain colored background with text", "un fond uni avec du texte", False),
     ("a screenshot of a video game", "une capture de jeu vidéo", False),
 ]
+
+# --- Évaluation (phase 6a) ---
+EVAL_CASES_PATH = ROOT / "eval" / "cases.yaml"   # jeu de test synthétique, versionné (aucune donnée réelle)
+EVAL_DIR = DATA_DIR / "eval"                     # vidéos générées + résultats (non versionnés)
+EVAL_REPORT_PATH = ROOT / "docs" / "evaluation.md"

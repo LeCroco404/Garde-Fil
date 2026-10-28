@@ -1,7 +1,8 @@
 """Garde-Fil : extraction des médias d'une vidéo avec ffmpeg.
 
-Phase 1 : piste audio uniquement. L'extraction d'images arrivera en phase 2.
+Audio (phase 1) pour Whisper, images (phase 2) pour l'OCR.
 """
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -40,3 +41,24 @@ def extract_audio(video_path: Path, out_dir: Path) -> Path | None:
         check=True,
     )
     return wav_path
+
+
+def extract_frames(video_path: Path, out_dir: Path, fps: float = 1.0) -> list[tuple[float, Path]]:
+    """Extrait `fps` image(s) par seconde en PNG (sans perte, meilleur pour l'OCR).
+
+    Retourne [(horodatage_en_secondes, chemin_image), ...] dans l'ordre chronologique.
+    """
+    frames_dir = out_dir / "frames"
+    if frames_dir.exists():
+        shutil.rmtree(frames_dir)  # évite de mélanger avec les images d'une analyse précédente
+    frames_dir.mkdir(parents=True)
+
+    subprocess.run(
+        ["ffmpeg", "-y", "-loglevel", "error",
+         "-i", str(video_path),
+         "-vf", f"fps={fps}",     # filtre fps : une image toutes les 1/fps secondes, à partir de t=0
+         str(frames_dir / "frame_%04d.png")],
+        check=True,
+    )
+    # L'image n°i (à partir de 0) correspond à l'instant i / fps
+    return [(round(i / fps, 2), p) for i, p in enumerate(sorted(frames_dir.glob("frame_*.png")))]

@@ -27,3 +27,10 @@ DATASET_SPLIT = "fr"
 
 # Score à partir duquel un passage est signalé au modérateur (affiné en phase 6)
 ALERT_THRESHOLD = 0.5
+
+# --- Images & OCR (texte incrusté) ---
+FRAME_FPS = 1          # 1 image par seconde : suffit pour un texte qui reste affiché ~1 s ou plus
+OCR_LANG = "fra"       # pack de langue Tesseract
+OCR_PSM = 11           # mode « texte épars » : adapté aux incrustations dispersées sur l'image
+OCR_MIN_CONF = 60      # on ignore les mots reconnus avec une confiance < 60 % (bruit, faux texte)
+OCR_SIMILARITY = 0.8   # deux images consécutives au texte similaire à 80 % = même incrustation

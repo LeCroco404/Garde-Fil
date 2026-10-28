@@ -29,8 +29,7 @@ class TextRiskClassifier:
             self._embedder = SentenceTransformer(self.embedder_name)
         return self._embedder
 
-    def embed(self, texts: list[str]) -> np.ndarray:
-        """Transforme une liste de textes en matrice (n_textes x 384)."""
+    def _encode(self, texts: list[str]) -> np.ndarray:
         return self.embedder.encode(
             texts,
             batch_size=32,
@@ -38,16 +37,40 @@ class TextRiskClassifier:
             show_progress_bar=len(texts) > 100,
         )
 
-    def fit(self, texts: list[str], labels: list[int], sample_weight=None) -> "TextRiskClassifier":
+    def embed(self, texts: list[str], cache_path: Path | None = None) -> np.ndarray:
+        """Transforme une liste de textes en matrice (n_textes x 384).
+
+        cache_path (optionnel) : cache disque {texte: vecteur}. Un texte déjà encodé n'est plus
+        recalculé. À réserver au jeu PUBLIC : on n'y met jamais de transcriptions (RGPD).
+        """
+        if cache_path is None:
+            return self._encode(texts)
+        cache = joblib.load(cache_path) if Path(cache_path).exists() else {}
+        store = cache.setdefault(self.embedder_name, {})  # un cache par modèle d'embeddings
+        missing = [t for t in dict.fromkeys(texts) if t not in store]  # dict.fromkeys : dédoublonne
+        if missing:
+            store.update(zip(missing, self._encode(missing)))
+            Path(cache_path).parent.mkdir(parents=True, exist_ok=True)
+            joblib.dump(cache, cache_path)
+        return np.vstack([store[t] for t in texts])
+
+    # Variantes « à partir d'embeddings déjà calculés » : évitent de recalculer les mêmes vecteurs
+    def fit_embeddings(self, X: np.ndarray, labels, sample_weight=None) -> "TextRiskClassifier":
         """sample_weight (optionnel) : importance de chaque exemple (ex. corrections des modérateurs)."""
-        self.clf.fit(self.embed(texts), labels, sample_weight=sample_weight)
+        self.clf.fit(X, labels, sample_weight=sample_weight)
         return self
+
+    def predict_proba_embeddings(self, X: np.ndarray) -> np.ndarray:
+        return self.clf.predict_proba(X)[:, 1]
+
+    def fit(self, texts: list[str], labels: list[int], sample_weight=None) -> "TextRiskClassifier":
+        return self.fit_embeddings(self.embed(texts), labels, sample_weight)
 
     def predict_proba(self, texts: list[str]) -> np.ndarray:
         """Probabilité d'appartenir à la classe « à risque » (1) pour chaque texte."""
         if not texts:
             return np.array([])
-        return self.clf.predict_proba(self.embed(texts))[:, 1]
+        return self.predict_proba_embeddings(self.embed(texts))
 
     def save(self, path: Path) -> None:
         """Sauvegarde le classifieur + le nom du modèle d'embeddings (pas le modèle lui-même)."""

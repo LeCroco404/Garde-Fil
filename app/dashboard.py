@@ -48,8 +48,11 @@ def load_results() -> list[dict]:
 def get_model(model_mtime: float):
     """Charge le classifieur une seule fois. La date du fichier sert de clé de cache :
     après un réapprentissage, le nouveau modèle est rechargé automatiquement."""
+    from src.pipeline import warm_up
     from src.text_classifier import TextRiskClassifier
-    return TextRiskClassifier.load(TEXT_CLF_PATH)
+    model = TextRiskClassifier.load(TEXT_CLF_PATH)
+    warm_up(model)  # charge embeddings + Whisper dès le départ, une seule fois
+    return model
 
 
 def run_analysis(videos: list[Path]) -> None:

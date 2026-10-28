@@ -12,7 +12,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from sklearn.metrics import classification_report  # noqa: E402
 
-from src.config import ALERT_THRESHOLD, DATASET_NAME, DATASET_SPLIT, TEXT_CLF_PATH, TEXT_METRICS_PATH  # noqa: E402
+from src.config import (ALERT_THRESHOLD, DATASET_NAME, DATASET_SPLIT, EMB_CACHE_PATH,  # noqa: E402
+                        TEXT_CLF_PATH, TEXT_METRICS_PATH)
 from src.data import binary_metrics, load_base_split  # noqa: E402
 from src.text_classifier import TextRiskClassifier  # noqa: E402
 
@@ -22,12 +23,14 @@ def main() -> None:
     #    Le jeu de test n'est JAMAIS vu à l'entraînement : c'est lui qui mesure la vraie performance.
     X_train, X_test, y_train, y_test = load_base_split()
 
-    # 2. Entraînement (le calcul des embeddings prend l'essentiel du temps)
-    print("Calcul des embeddings et entraînement...")
-    model = TextRiskClassifier().fit(X_train, y_train)
+    # 2. Entraînement. Les embeddings du jeu public sont mis en cache : le 1er lancement les
+    #    calcule (quelques minutes), les suivants les relisent depuis le disque (quelques secondes).
+    print("Calcul des embeddings (ou lecture du cache) et entraînement...")
+    model = TextRiskClassifier()
+    model.fit_embeddings(model.embed(X_train, cache_path=EMB_CACHE_PATH), y_train)
 
     # 3. Évaluation au seuil d'alerte
-    scores = model.predict_proba(X_test)
+    scores = model.predict_proba_embeddings(model.embed(X_test, cache_path=EMB_CACHE_PATH))
     y_pred = (scores >= ALERT_THRESHOLD).astype(int)
     print("\n" + classification_report(y_test, y_pred, target_names=["non toxique", "toxique"], digits=3))
     metrics = binary_metrics(y_test, scores)

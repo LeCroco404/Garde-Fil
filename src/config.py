@@ -62,3 +62,11 @@ REVIEWS_PATH = FEEDBACK_DIR / "reviews.jsonl"   # journal des revues : une ligne
 FEEDBACK_WEIGHT = 3.0      # un exemple corrigé par un modérateur pèse 3x un exemple du jeu public
 MAX_F1_DROP = 0.01         # garde-fou : on refuse un nouveau modèle qui perd plus de 0.01 de F1
 TEXT_CLF_BACKUP_PATH = MODELS_DIR / "text_clf.prev.joblib"
+
+# --- Performance (phase 5a) ---
+OCR_WORKERS = 4              # images lues en parallèle par Tesseract (ton Mac a 8 cœurs)
+# Une image est relue si plus de 0,05 % de ses pixels ont changé de plus de 30 niveaux (sur 255).
+# Un texte qui apparaît change peu de pixels mais fortement ; le bruit de compression, l'inverse.
+FRAME_CHANGE_PIXEL = 30
+FRAME_CHANGE_RATIO = 0.0005
+EMB_CACHE_PATH = MODELS_DIR / "embeddings_cache.joblib"  # cache des embeddings du jeu PUBLIC uniquement

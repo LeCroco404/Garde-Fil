@@ -1,0 +1,16 @@
+# Environnement
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+
+# Données et modèles : jamais versionnés (RGPD + taille)
+# On ignore tout le contenu de data/ mais on garde l'arborescence via les .gitkeep
+data/**
+!data/**/
+!data/**/.gitkeep
+models/*
+!models/.gitkeep
+
+# Secrets éventuels
+.env

@@ -1,0 +1,53 @@
+# Garde-Fil : jeu de test vidéo SYNTHÉTIQUE (sujet voisin : harcèlement / toxicité).
+#
+# Toutes les phrases sont écrites pour le projet : aucune donnée réelle, aucune personne réelle.
+# Ce fichier est versionné ; les vidéos générées (data/eval/) ne le sont pas.
+#
+# label : 1 = la vidéo DOIT être transmise au modérateur, 0 = elle ne doit PAS l'être.
+# category :
+#   neutre          contenus du quotidien
+#   negatif_sans_cible  vocabulaire négatif qui ne vise personne (critique d'un film, météo)
+#   risque          harcèlement explicite (parole, écran, ou les deux)
+#   exclusion       harcèlement par exclusion, formulé calmement (cas difficile, cf. phase 3)
+#   prevention      prévention, information, témoignage de guérison : NE DOIT PAS être signalé
+#                   (équivalent, sur le sujet voisin, des contenus d'aide du vrai sujet)
+#   image_*         cas visuels, générés seulement si la photo existe dans data/images/
+#
+# Champs vidéo : speech (texte dit), overlay (texte à l'écran, "" si aucun), overlay_start (s).
+# Cas image : image (nom du fichier dans data/images/).
+
+cases:
+  # --- neutre (label 0) ---
+  - {id: n1, category: neutre, label: 0, speech: "Aujourd'hui je teste un nouveau café dans mon quartier, il est vraiment bon.", overlay: "Mon avis café"}
+  - {id: n2, category: neutre, label: 0, speech: "Petit tuto pour réviser ses examens sans stress, on commence par un planning.", overlay: "Astuce révisions"}
+  - {id: n3, category: neutre, label: 0, speech: "On part en randonnée ce week-end, regardez ce paysage incroyable.", overlay: ""}
+  - {id: n4, category: neutre, label: 0, speech: "Voici mon entraînement de tennis du jour, on travaille le revers.", overlay: "Entraînement"}
+  - {id: n5, category: neutre, label: 0, speech: "Je vous montre comment j'organise mon bureau pour être plus efficace.", overlay: ""}
+
+  # --- négatif sans cible (label 0) ---
+  - {id: h1, category: negatif_sans_cible, label: 0, speech: "Ce film était vraiment nul, je ne vous le conseille pas.", overlay: "Critique ciné"}
+  - {id: h2, category: negatif_sans_cible, label: 0, speech: "Il pleut encore, cette journée est horrible.", overlay: ""}
+
+  # --- risque explicite (label 1) ---
+  - {id: r1, category: risque, label: 1, speech: "T'es vraiment pathétique, tout le monde se moque de toi.", overlay: ""}
+  - {id: r2, category: risque, label: 1, speech: "Ferme-la, personne ne t'a demandé ton avis, espèce d'idiot.", overlay: ""}
+  - {id: r3, category: risque, label: 1, speech: "Regardez ce que j'ai trouvé.", overlay: "T'es la honte de la classe", overlay_start: 1}
+  - {id: r4, category: risque, label: 1, speech: "Petite vidéo du soir.", overlay: "Dégage, personne ne veut de toi", overlay_start: 1}
+  - {id: r5, category: risque, label: 1, speech: "Tu sers à rien, va-t'en.", overlay: "Tu sers à rien"}
+
+  # --- exclusion calme (label 1, formulations jamais vues par le modèle) ---
+  - {id: e1, category: exclusion, label: 1, speech: "On a créé un nouveau groupe sans toi, ne cherche pas à nous rejoindre.", overlay: ""}
+  - {id: e2, category: exclusion, label: 1, speech: "Plus personne ne veut s'asseoir à côté de toi à la cantine, c'est comme ça.", overlay: ""}
+  - {id: e3, category: exclusion, label: 1, speech: "On préfère que tu ne viennes plus aux soirées, tu comprends.", overlay: ""}
+
+  # --- prévention / information / témoignage (label 0 : ne doit PAS être signalé) ---
+  - {id: p1, category: prevention, label: 0, speech: "Le harcèlement en ligne, ça suffit. Si tu en es victime, parles-en à un adulte ou appelle le 3018.", overlay: "Prévention"}
+  - {id: p2, category: prevention, label: 0, speech: "Un élève sur dix déclare avoir été victime de harcèlement. Ensemble, on peut agir.", overlay: "Chiffres clés"}
+  - {id: p3, category: prevention, label: 0, speech: "Quand j'étais au collège, on se moquait de moi. Aujourd'hui je vais bien et je veux vous dire qu'on peut s'en sortir.", overlay: "Mon témoignage"}
+  - {id: p4, category: prevention, label: 0, speech: "Si un ami reçoit des insultes en ligne, ne reste pas spectateur : signale et soutiens-le.", overlay: "Les bons réflexes"}
+  - {id: p5, category: prevention, label: 0, speech: "Les insultes répétées sur les réseaux sont punies par la loi. Pense à faire des captures d'écran.", overlay: "Ce que dit la loi"}
+
+  # --- image (optionnels : photos de la phase 5b) ---
+  - {id: i1, category: image_neutre, label: 0, image: repas.jpg}
+  - {id: i2, category: image_risque, label: 1, image: dispute.jpg}
+  - {id: i3, category: image_contexte, label: 0, image: boxe.jpg}

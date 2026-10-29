@@ -14,6 +14,28 @@ Le projet vise à terme les contenus liés à l'automutilation et au suicide. Po
 4. Ne pas signaler la prévention. Un message de prévention ou un témoignage de guérison parle du sujet sans être à risque ; c'est le cas de test prioritaire.
 5. Expliquer chaque signalement : quoi, où (parole, écran, image), quand, avec quel score.
 
+## Aperçu
+
+<p>
+  <img src="docs/img/file-de-revue.png" alt="File de revue triée par niveau de risque" width="27%">
+  &nbsp;
+  <img src="docs/img/convergence.png" alt="Vidéo signalée : niveau, raisons horodatées et action recommandée" width="70%">
+</p>
+
+À gauche, la file de revue, triée par urgence. À droite, une vidéo signalée : le même message est dit et affiché à l'écran au même moment, d'où le bonus de convergence. L'action recommandée oriente vers une ressource d'aide.
+
+<img src="docs/img/formulaire-revue.png" alt="Formulaire de revue des passages" width="100%">
+
+Le modérateur valide ou corrige l'étiquette de chaque passage. La décision sur la vidéo n'a pas de valeur par défaut, pour qu'il la choisisse activement. Ses corrections alimentent le réapprentissage.
+
+<img src="docs/img/prevention.png" alt="Vidéo de prévention non transmise au modérateur" width="100%">
+
+Une vidéo de prévention sur le harcèlement : elle parle du sujet, mais aucun passage ne dépasse le seuil d'alerte et elle n'est pas transmise. Le mode audit permet tout de même de la relire.
+
+<img src="docs/img/pipeline-terminal.png" alt="Sortie du pipeline en ligne de commande" width="100%">
+
+La même analyse en ligne de commande, avec le détail par source et le temps passé dans chaque étape.
+
 ## Architecture
 
 ```mermaid

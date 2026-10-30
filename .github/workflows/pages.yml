@@ -1,0 +1,34 @@
+# Garde-Fil : publie la démo statique (dossier site/) sur GitHub Pages à chaque modification.
+# Prérequis (une seule fois) : Settings -> Pages -> Source : « GitHub Actions ».
+name: Démo GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths: ["site/**", ".github/workflows/pages.yml"]
+  workflow_dispatch:   # relance manuelle possible depuis l'onglet Actions
+
+# Droits minimaux : lire le dépôt, publier sur Pages (jeton d'identité requis par deploy-pages)
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4

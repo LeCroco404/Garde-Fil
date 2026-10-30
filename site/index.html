@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Garde-Fil, démo</title>
+<meta name="description" content="Démo d'un prototype d'aide à la modération de vidéos courtes : le système signale et explique, un humain décide.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+<style>
+  :root {
+    --bg: #f7f7f5; --surface: #ffffff; --text: #1d1d1f; --muted: #5f6368; --border: #dcdcd8;
+    --accent: #2f5fd0; --info-bg: #eaf0fc; --high: #c62828; --mid: #d97706; --low: #2e7d32;
+    --code-bg: #f0f0ec;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #121315; --surface: #1c1d20; --text: #ececec; --muted: #a3a6ab; --border: #33353a;
+      --accent: #7aa2ff; --info-bg: #1d2738; --high: #ef5350; --mid: #f0a43a; --low: #66bb6a;
+      --code-bg: #26282c;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 1080px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 1.9rem; margin: 0 0 8px; }
+  h2 { font-size: 1.3rem; margin: 0 0 4px; }
+  p { margin: 0 0 12px; }
+  .info { background: var(--info-bg); border-radius: 10px; padding: 12px 16px; margin: 16px 0 20px; }
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 20px; flex-wrap: wrap; }
+  .tabs button { background: none; border: none; border-bottom: 3px solid transparent; color: var(--muted);
+                 font: inherit; padding: 10px 14px; cursor: pointer; }
+  .tabs button[aria-selected="true"] { color: var(--text); border-bottom-color: var(--accent); font-weight: 600; }
+  .panel[hidden] { display: none; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); gap: 20px; align-items: start; }
+  @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+  video { width: 100%; max-height: 70vh; background: #000; border-radius: 10px; }
+  select, textarea { width: 100%; font: inherit; color: var(--text); background: var(--surface);
+                     border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
+  label { display: block; font-weight: 600; margin: 0 0 6px; }
+  .level { font-size: 1.35rem; font-weight: 700; margin: 0 0 2px; }
+  .level.élevé { color: var(--high); } .level.modéré { color: var(--mid); } .level.faible { color: var(--low); }
+  .muted { color: var(--muted); font-size: .92rem; }
+  ul.reasons { padding-left: 18px; margin: 4px 0 12px; }
+  details { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
+  summary { cursor: pointer; font-weight: 600; }
+  .seg { margin: 10px 0; }
+  .seg code { background: var(--code-bg); padding: 1px 6px; border-radius: 4px; }
+  fieldset { border: none; padding: 0; margin: 8px 0; display: flex; gap: 16px; flex-wrap: wrap; }
+  button.primary { background: var(--accent); color: #fff; border: none; border-radius: 8px;
+                   padding: 10px 18px; font: inherit; font-weight: 600; cursor: pointer; margin-top: 10px; }
+  button.primary:disabled { opacity: .5; cursor: wait; }
+  table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+  td, th { border-bottom: 1px solid var(--border); padding: 6px; text-align: left; }
+  footer { margin-top: 40px; border-top: 1px solid var(--border); padding-top: 14px; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>🛡️ Garde-Fil, démo</h1>
+  <p>Garde-Fil est un prototype d'<strong>aide à la modération</strong> de vidéos courtes. Il écoute ce qui est dit,
+     lit ce qui est écrit à l'écran, puis indique à un modérateur humain <strong>si une vidéo mérite d'être revue,
+     et pourquoi</strong>. Il ne supprime jamais rien : c'est toujours une personne qui décide.</p>
+  <div class="info">Cette démo porte sur le <strong>harcèlement en ligne</strong>. Toutes les vidéos sont
+     <strong>fabriquées pour l'exemple</strong> (voix de synthèse, fond uni) : aucune personne réelle.
+     Rien de ce que vous faites ici n'est envoyé ni enregistré.</div>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" aria-controls="tab-videos" id="t-videos">🎬 Vidéos d'exemple</button>
+    <button role="tab" aria-selected="false" aria-controls="tab-phrase" id="t-phrase">✍️ Tester une phrase</button>
+    <button role="tab" aria-selected="false" aria-controls="tab-how" id="t-how">⚙️ Comment ça marche</button>
+  </div>
+
+  <!-- Onglet 1 : vidéos analysées à l'avance -->
+  <section class="panel" id="tab-videos" role="tabpanel">
+    <label for="example">Choisissez un exemple</label>
+    <select id="example"></select>
+    <div class="grid" style="margin-top:16px">
+      <video id="video" controls playsinline preload="metadata"></video>
+      <div class="card">
+        <p class="level" id="ex-level"></p>
+        <p class="muted" id="ex-meaning"></p>
+        <p><strong>À remarquer : </strong><span id="ex-note"></span></p>
+        <div id="ex-reasons-block">
+          <strong>Ce que le système explique au modérateur :</strong>
+          <ul class="reasons" id="ex-reasons"></ul>
+        </div>
+        <p><strong>Action recommandée : </strong><span id="ex-action"></span></p>
+        <details>
+          <summary>Détail : ce que le système a entendu et lu</summary>
+          <div id="ex-segments"></div>
+          <p class="muted">Score : de 0 (rien d'inquiétant) à 1 (très probablement du harcèlement).
+             Un passage est signalé à partir de 0,50.</p>
+        </details>
+        <details>
+          <summary>Ce que verrait le modérateur pour décider</summary>
+          <fieldset disabled>
+            <label><input type="radio" name="d"> Risque confirmé</label>
+            <label><input type="radio" name="d"> Pas de risque</label>
+            <label><input type="radio" name="d"> Escalade (cas complexe)</label>
+          </fieldset>
+          <p class="muted">Dans l'outil réel, le modérateur choisit lui-même (aucune réponse n'est proposée par défaut)
+             et peut corriger le système. Désactivé dans la démo.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- Onglet 2 : tester une phrase, calcul entièrement dans le navigateur -->
+  <section class="panel" id="tab-phrase" role="tabpanel" hidden>
+    <p>Écrivez une phrase comme si elle était dite dans une vidéo. Le système donne un score de 0 à 1.
+       <strong>N'écrivez aucune information personnelle.</strong></p>
+    <label for="phrase">Votre phrase</label>
+    <textarea id="phrase" rows="3" maxlength="300" placeholder="Exemple : Personne ne veut de toi ici, dégage."></textarea>
+    <button class="primary" id="analyze">Analyser</button>
+    <p class="muted" id="status" aria-live="polite"></p>
+    <div class="card" id="phrase-result" hidden>
+      <p class="level" id="ph-level"></p>
+      <p class="muted" id="ph-meaning"></p>
+      <p class="muted" id="ph-short" hidden>Phrase de moins de 3 mots : trop courte pour déclencher une alerte
+         à elle seule, car sans contexte le système se trompe facilement.</p>
+    </div>
+    <p class="muted" style="margin-top:16px">Le calcul se fait <strong>dans votre navigateur</strong> : votre phrase
+       n'est envoyée nulle part. À la première analyse, le navigateur télécharge le modèle de langage depuis
+       Hugging Face (un peu plus de 100 Mo), puis le garde en mémoire. Ce modèle a été entraîné à reconnaître le
+       harcèlement : une phrase isolée, sans le reste de la vidéo, peut être mal jugée, et c'est pour ça qu'un
+       humain décide.</p>
+
+    <!-- Vérification (visible avec #verif dans l'adresse) : compare le navigateur aux scores calculés en Python -->
+    <div class="card" id="verif" hidden style="margin-top:20px">
+      <h2>Vérification du modèle</h2>
+      <p class="muted">Compare les scores du modèle compressé (navigateur) à ceux calculés en pleine précision en Python.</p>
+      <button class="primary" id="verif-run">Lancer la vérification</button>
+      <p id="verif-summary"></p>
+      <table><thead><tr><th>Phrase</th><th>Python</th><th>Navigateur</th><th>Écart</th></tr></thead>
+        <tbody id="verif-rows"></tbody></table>
+    </div>
+  </section>
+
+  <!-- Onglet 3 : explication -->
+  <section class="panel" id="tab-how" role="tabpanel" hidden>
+    <ol>
+      <li><strong>Écouter et lire.</strong> Le système transcrit la parole et lit le texte affiché à l'écran.</li>
+      <li><strong>Comprendre le sens.</strong> Chaque phrase est transformée en une représentation de son sens,
+          puis comparée à des milliers d'exemples. Il n'y a pas de liste de mots interdits :
+          « ce film est nul » n'est pas du harcèlement, une vidéo de prévention non plus.</li>
+      <li><strong>Expliquer.</strong> Le système indique quoi, où et quand : « passage dit et affiché à l'écran à 0:02 ».</li>
+      <li><strong>Laisser décider un humain.</strong> Le modérateur confirme ou corrige. Ses corrections aident
+          le système à s'améliorer, avec des garde-fous.</li>
+      <li><strong>Orienter vers l'aide.</strong> Quand un risque est confirmé, l'action proposée est d'orienter la
+          personne vers une aide (ici le 3018, numéro contre le harcèlement), plutôt que de simplement bloquer.</li>
+    </ol>
+    <p>Code, méthode, résultats et limites :
+       <a href="https://github.com/LeCroco404/Garde-Fil">dépôt GitHub du projet</a>.</p>
+  </section>
+
+  <footer class="muted">Besoin d'aide ? Harcèlement en ligne : 3018 (gratuit). Idées suicidaires, pour soi ou un
+    proche : 3114 (gratuit, 24 h/24, 7 j/7). En cas d'urgence : 15 ou 112.</footer>
+</main>
+
+<script type="module">
+// Version épinglée : la page ne change pas de comportement si une nouvelle version sort
+const TRANSFORMERS_URL = "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1";
+const BROWSER_MODEL = "Xenova/paraphrase-multilingual-MiniLM-L12-v2";  // version ONNX du modèle utilisé en Python
+
+const LEVELS = {
+  "élevé":  ["🔴 Risque élevé",  "La vidéo serait montrée en priorité à un modérateur humain."],
+  "modéré": ["🟠 Risque modéré", "La vidéo serait montrée à un modérateur humain."],
+  "faible": ["🟢 Risque faible", "La vidéo ne serait pas montrée au modérateur."],
+};
+const SOURCES = { parole: "🗣️ dit", ecran: "🖥️ écrit à l'écran", image: "🖼️ image" };
+const $ = (id) => document.getElementById(id);
+// Tout le texte est inséré avec textContent (jamais innerHTML) : aucun risque d'injection de code
+const el = (tag, text) => { const e = document.createElement(tag); if (text !== undefined) e.textContent = text; return e; };
+const fmtTs = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+const fmt = (x) => x.toFixed(2);
+
+function showLevel(prefix, level, score) {
+  const [label, meaning] = LEVELS[level];
+  $(`${prefix}-level`).textContent = `${label} · score ${fmt(score)}`;
+  $(`${prefix}-level`).className = `level ${level}`;
+  $(`${prefix}-meaning`).textContent = meaning;
+}
+
+// ---------- Onglets ----------
+const tabs = ["videos", "phrase", "how"];
+function openTab(name) {
+  for (const t of tabs) {
+    $(`t-${t}`).setAttribute("aria-selected", String(t === name));
+    $(`tab-${t}`).hidden = t !== name;
+  }
+}
+for (const t of tabs) $(`t-${t}`).addEventListener("click", () => openTab(t));
+
+// ---------- Onglet 1 : exemples ----------
+const examples = await (await fetch("data/examples.json")).json();
+examples.forEach((ex, i) => $("example").append(Object.assign(el("option", ex.title), { value: i })));
+
+function showExample(i) {
+  const ex = examples[i];
+  $("video").src = ex.video;
+  showLevel("ex", ex.risk.level, ex.risk.score);
+  $("ex-note").textContent = ex.note;
+  $("ex-action").textContent = ex.risk.action;
+  $("ex-reasons").replaceChildren(...ex.risk.reasons.map((r) => el("li", r)));
+  $("ex-reasons-block").hidden = ex.risk.reasons.length === 0;
+  $("ex-segments").replaceChildren(...ex.segments.map((s) => {
+    const div = el("div"); div.className = "seg";
+    div.append(el("code", fmtTs(s.start)), ` ${SOURCES[s.source]} · score `, el("strong", fmt(s.score)),
+               s.flagged ? " ⚠️" : "", el("br"), s.text);
+    return div;
+  }));
+}
+$("example").addEventListener("change", (e) => showExample(Number(e.target.value)));
+showExample(0);
+
+// ---------- Onglet 2 : score d'une phrase dans le navigateur ----------
+const params = await (await fetch("data/text_model.json")).json();
+let extractorPromise = null;
+
+function loadExtractor() {
+  // Chargé seulement au premier clic : la page reste légère pour qui ne teste pas de phrase
+  extractorPromise ??= (async () => {
+    const { pipeline } = await import(TRANSFORMERS_URL);
+    return pipeline("feature-extraction", BROWSER_MODEL, {
+      dtype: "q8",   // modèle compressé (8 bits) : ~4x plus léger, vérifié via #verif
+      progress_callback: (p) => {
+        if (p.status === "progress" && p.total) {
+          $("status").textContent = `Téléchargement du modèle : ${Math.round((100 * p.loaded) / p.total)} %`;
+        }
+      },
+    });
+  })();
+  return extractorPromise;
+}
+
+async function scoreText(text) {
+  const extractor = await loadExtractor();
+  // Même calcul qu'en Python : moyenne des vecteurs de mots, normalisée, puis régression logistique
+  const out = await extractor(text, { pooling: "mean", normalize: true });
+  let z = params.intercept;
+  for (let i = 0; i < params.coef.length; i++) z += out.data[i] * params.coef[i];
+  return 1 / (1 + Math.exp(-z));
+}
+
+function levelOf(text, score) {
+  const words = text.match(/[\p{L}\p{M}\p{N}_]+/gu) ?? [];   // équivalent de \w+ en Python
+  const tooShort = words.length < params.min_words_to_flag;
+  if (score < params.alert_threshold || tooShort) return ["faible", tooShort];
+  return [score >= params.high_threshold ? "élevé" : "modéré", false];
+}
+
+$("analyze").addEventListener("click", async () => {
+  const text = $("phrase").value.trim();
+  if (!text) { $("status").textContent = "Écrivez une phrase d'abord."; return; }
+  $("analyze").disabled = true;
+  $("status").textContent = "Analyse… (la première fois, le modèle se télécharge)";
+  try {
+    const score = await scoreText(text);
+    const [level, tooShort] = levelOf(text, score);
+    showLevel("ph", level, score);
+    $("ph-short").hidden = !tooShort;
+    $("phrase-result").hidden = false;
+    $("status").textContent = "";
+  } catch (err) {
+    $("status").textContent = "Le modèle n'a pas pu être chargé (connexion ou navigateur trop ancien). Réessayez.";
+    extractorPromise = null;
+    console.error(err);
+  } finally {
+    $("analyze").disabled = false;
+  }
+});
+
+// ---------- Vérification (#verif) ----------
+function showVerifIfAsked() {
+  if (location.hash !== "#verif") return;
+  openTab("phrase");
+  $("verif").hidden = false;
+}
+showVerifIfAsked();
+window.addEventListener("hashchange", showVerifIfAsked);  // aussi si #verif est ajouté après le chargement
+{
+  $("verif-run").addEventListener("click", async () => {
+    $("verif-run").disabled = true;
+    const ref = await (await fetch("data/reference.json")).json();
+    let maxGap = 0, sameDecision = 0;
+    const rows = [];
+    for (const r of ref) {
+      const s = await scoreText(r.text);
+      const gap = Math.abs(s - r.score);
+      maxGap = Math.max(maxGap, gap);
+      if ((s >= params.alert_threshold) === (r.score >= params.alert_threshold)) sameDecision++;
+      const tr = el("tr");
+      tr.append(el("td", r.text), el("td", fmt(r.score)), el("td", fmt(s)), el("td", fmt(gap)));
+      rows.push(tr);
+    }
+    $("verif-rows").replaceChildren(...rows);
+    $("verif-summary").textContent =
+      `Écart maximal : ${fmt(maxGap)} · même décision (seuil 0,50) : ${sameDecision}/${ref.length}`;
+    $("verif-run").disabled = false;
+  });
+}
+</script>
+</body>
+</html>

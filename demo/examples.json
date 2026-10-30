@@ -1,0 +1,487 @@
+[
+  {
+    "id": "cuisine",
+    "title": "Une recette de cuisine",
+    "note": "Un contenu ordinaire : rien n'est signalé, la vidéo ne serait même pas montrée au modérateur.",
+    "video": "videos/cuisine.mp4",
+    "result": {
+      "video": "cuisine.mp4",
+      "has_audio": true,
+      "n_frames": 4,
+      "n_ocr": 1,
+      "risk": {
+        "score": 0.136,
+        "level": "faible",
+        "flagged": false,
+        "first_alert": null,
+        "reasons": [],
+        "action": "Aucune action recommandée.",
+        "moments": []
+      },
+      "segments": [
+        {
+          "start": 0.0,
+          "end": 4.0,
+          "text": "Recette du jour",
+          "ocr_conf": 95.7,
+          "source": "ecran",
+          "score": 0.095,
+          "flagged": false,
+          "too_short": false
+        },
+        {
+          "start": 0.0,
+          "end": 4.4,
+          "text": "Aujourd'hui je vous montre ma recette de crêpe préférée, c'est vraiment simple.",
+          "source": "parole",
+          "score": 0.136,
+          "flagged": false,
+          "too_short": false
+        }
+      ],
+      "timings": {
+        "audio": 1.19,
+        "transcription": 1.7,
+        "images": 0.15,
+        "ocr": 0.22,
+        "classification": 0.61,
+        "fusion": 0.0,
+        "total": 3.87
+      }
+    }
+  },
+  {
+    "id": "insulte",
+    "title": "Une insulte dite à l'oral",
+    "note": "Le message est repéré dans la parole. Même quand la transcription fait une petite erreur, le sens agressif de la phrase est reconnu.",
+    "video": "videos/insulte.mp4",
+    "result": {
+      "video": "insulte.mp4",
+      "has_audio": true,
+      "n_frames": 4,
+      "n_ocr": 1,
+      "risk": {
+        "score": 0.833,
+        "level": "élevé",
+        "flagged": true,
+        "first_alert": "0:00",
+        "reasons": [
+          "0:00-0:03 : passage dit (score 0.83) « C'était vraiment un gros nul, ferme-la et dégage de cette vidéo. »"
+        ],
+        "action": "Revue prioritaire. Si le risque est confirmé, privilégier un message d'orientation vers le 3018 (cyberharcèlement) plutôt qu'un simple blocage.",
+        "moments": [
+          {
+            "start": 0.0,
+            "end": 3.4,
+            "score": 0.833,
+            "bonus": 0.0,
+            "sources": [
+              "parole"
+            ],
+            "converging": false,
+            "top": {
+              "start": 0.0,
+              "end": 3.4,
+              "text": "C'était vraiment un gros nul, ferme-la et dégage de cette vidéo.",
+              "source": "parole",
+              "score": 0.833,
+              "flagged": true,
+              "too_short": false
+            }
+          }
+        ]
+      },
+      "segments": [
+        {
+          "start": 0.0,
+          "end": 4.0,
+          "text": "Test toxique",
+          "ocr_conf": 96.0,
+          "source": "ecran",
+          "score": 0.07,
+          "flagged": false,
+          "too_short": false
+        },
+        {
+          "start": 0.0,
+          "end": 3.4,
+          "text": "C'était vraiment un gros nul, ferme-la et dégage de cette vidéo.",
+          "source": "parole",
+          "score": 0.833,
+          "flagged": true,
+          "too_short": false
+        }
+      ],
+      "timings": {
+        "audio": 0.18,
+        "transcription": 1.45,
+        "images": 0.14,
+        "ocr": 0.14,
+        "classification": 0.09,
+        "fusion": 0.0,
+        "total": 2.0
+      }
+    }
+  },
+  {
+    "id": "ecran",
+    "title": "Un message écrit à l'écran, voix neutre",
+    "note": "La voix ne dit rien de grave : c'est le texte incrusté qui est repéré, à la seconde où il apparaît. Sans lecture de l'écran, cette vidéo passerait inaperçue.",
+    "video": "videos/ecran.mp4",
+    "result": {
+      "video": "ecran.mp4",
+      "has_audio": true,
+      "n_frames": 4,
+      "n_ocr": 2,
+      "risk": {
+        "score": 0.894,
+        "level": "élevé",
+        "flagged": true,
+        "first_alert": "0:02",
+        "reasons": [
+          "0:02-0:04 : passage affiché à l'écran (score 0.89) « Personne ne te supporte ici dégage, t'es de trop »"
+        ],
+        "action": "Revue prioritaire. Si le risque est confirmé, privilégier un message d'orientation vers le 3018 (cyberharcèlement) plutôt qu'un simple blocage.",
+        "moments": [
+          {
+            "start": 2.0,
+            "end": 4.0,
+            "score": 0.894,
+            "bonus": 0.0,
+            "sources": [
+              "ecran"
+            ],
+            "converging": false,
+            "top": {
+              "start": 2.0,
+              "end": 4.0,
+              "text": "Personne ne te supporte ici dégage, t'es de trop",
+              "ocr_conf": 95.9,
+              "source": "ecran",
+              "score": 0.894,
+              "flagged": true,
+              "too_short": false
+            }
+          }
+        ]
+      },
+      "segments": [
+        {
+          "start": 0.0,
+          "end": 3.68,
+          "text": "Voici un petit résumé de ma journée, rien de spécial.",
+          "source": "parole",
+          "score": 0.06,
+          "flagged": false,
+          "too_short": false
+        },
+        {
+          "start": 2.0,
+          "end": 4.0,
+          "text": "Personne ne te supporte ici dégage, t'es de trop",
+          "ocr_conf": 95.9,
+          "source": "ecran",
+          "score": 0.894,
+          "flagged": true,
+          "too_short": false
+        }
+      ],
+      "timings": {
+        "audio": 0.17,
+        "transcription": 1.21,
+        "images": 0.13,
+        "ocr": 0.18,
+        "classification": 0.04,
+        "fusion": 0.0,
+        "total": 1.73
+      }
+    }
+  },
+  {
+    "id": "convergence",
+    "title": "Un message dit ET écrit en même temps",
+    "note": "Les deux sources se confirment au même instant : le score monte et la vidéo passe en revue prioritaire.",
+    "video": "videos/convergence.mp4",
+    "result": {
+      "video": "convergence.mp4",
+      "has_audio": true,
+      "n_frames": 2,
+      "n_ocr": 1,
+      "risk": {
+        "score": 0.972,
+        "level": "élevé",
+        "flagged": true,
+        "first_alert": "0:00",
+        "reasons": [
+          "0:00-0:02 : passage dit ET affiché à l'écran (score 0.97) « C'était vraiment un gros nul, ferme-la. » [convergence parole + écran : +0.03]"
+        ],
+        "action": "Revue prioritaire. Si le risque est confirmé, privilégier un message d'orientation vers le 3018 (cyberharcèlement) plutôt qu'un simple blocage.",
+        "moments": [
+          {
+            "start": 0.0,
+            "end": 2.12,
+            "score": 0.972,
+            "bonus": 0.029,
+            "sources": [
+              "parole",
+              "ecran"
+            ],
+            "converging": true,
+            "top": {
+              "start": 0.0,
+              "end": 2.12,
+              "text": "C'était vraiment un gros nul, ferme-la.",
+              "source": "parole",
+              "score": 0.943,
+              "flagged": true,
+              "too_short": false
+            }
+          }
+        ]
+      },
+      "segments": [
+        {
+          "start": 0.0,
+          "end": 2.0,
+          "text": "Personne ne veut de toi ici",
+          "ocr_conf": 95.3,
+          "source": "ecran",
+          "score": 0.683,
+          "flagged": true,
+          "too_short": false
+        },
+        {
+          "start": 0.0,
+          "end": 2.12,
+          "text": "C'était vraiment un gros nul, ferme-la.",
+          "source": "parole",
+          "score": 0.943,
+          "flagged": true,
+          "too_short": false
+        }
+      ],
+      "timings": {
+        "audio": 0.17,
+        "transcription": 1.13,
+        "images": 0.12,
+        "ocr": 0.13,
+        "classification": 0.04,
+        "fusion": 0.0,
+        "total": 1.59
+      }
+    }
+  },
+  {
+    "id": "prevention",
+    "title": "Une vidéo de prévention",
+    "note": "Elle parle de harcèlement, mais pour aider. Elle n'est pas signalée : c'est le cas le plus important du projet, car un système qui bloquerait la prévention ferait plus de mal que de bien.",
+    "video": "videos/prevention.mp4",
+    "result": {
+      "video": "prevention.mp4",
+      "has_audio": true,
+      "n_frames": 7,
+      "n_ocr": 1,
+      "risk": {
+        "score": 0.423,
+        "level": "faible",
+        "flagged": false,
+        "first_alert": null,
+        "reasons": [],
+        "action": "Aucune action recommandée.",
+        "moments": []
+      },
+      "segments": [
+        {
+          "start": 0.0,
+          "end": 7.0,
+          "text": "Prévention",
+          "ocr_conf": 95.0,
+          "source": "ecran",
+          "score": 0.022,
+          "flagged": false,
+          "too_short": false
+        },
+        {
+          "start": 0.0,
+          "end": 7.0,
+          "text": "Le harcèlement en ligne, ça suffit. Si tu en es victime, parlons à un adulte ou appellent le 3018.",
+          "source": "parole",
+          "score": 0.423,
+          "flagged": false,
+          "too_short": false
+        }
+      ],
+      "timings": {
+        "audio": 0.17,
+        "transcription": 1.61,
+        "images": 0.15,
+        "ocr": 0.17,
+        "classification": 0.05,
+        "fusion": 0.0,
+        "total": 2.15
+      }
+    }
+  },
+  {
+    "id": "temoignage",
+    "title": "Un témoignage : « on peut s'en sortir »",
+    "note": "Quelqu'un raconte ce qu'il a vécu pour encourager les autres. Ce témoignage ne doit pas être signalé, et il ne l'est pas.",
+    "video": "videos/temoignage.mp4",
+    "result": {
+      "video": "temoignage.mp4",
+      "has_audio": true,
+      "n_frames": 6,
+      "n_ocr": 1,
+      "risk": {
+        "score": 0.311,
+        "level": "faible",
+        "flagged": false,
+        "first_alert": null,
+        "reasons": [],
+        "action": "Aucune action recommandée.",
+        "moments": []
+      },
+      "segments": [
+        {
+          "start": 0.0,
+          "end": 6.0,
+          "text": "Mon témoignage",
+          "ocr_conf": 96.0,
+          "source": "ecran",
+          "score": 0.064,
+          "flagged": false,
+          "too_short": false
+        },
+        {
+          "start": 0.0,
+          "end": 4.24,
+          "text": "Quand j'étais au collège, on se moquait de moi, aujourd'hui je vais bien et je veux",
+          "source": "parole",
+          "score": 0.221,
+          "flagged": false,
+          "too_short": false
+        },
+        {
+          "start": 4.24,
+          "end": 6.0,
+          "text": "vous dire qu'on peut s'en sortir.",
+          "source": "parole",
+          "score": 0.311,
+          "flagged": false,
+          "too_short": false
+        }
+      ],
+      "timings": {
+        "audio": 0.17,
+        "transcription": 1.75,
+        "images": 0.15,
+        "ocr": 0.16,
+        "classification": 0.06,
+        "fusion": 0.0,
+        "total": 2.29
+      }
+    }
+  },
+  {
+    "id": "critique",
+    "title": "Une critique de film (« nul »)",
+    "note": "Un mot négatif ne suffit pas : personne n'est visé. Le système juge le sens, pas les mots.",
+    "video": "videos/critique.mp4",
+    "result": {
+      "video": "critique.mp4",
+      "has_audio": true,
+      "n_frames": 3,
+      "n_ocr": 1,
+      "risk": {
+        "score": 0.415,
+        "level": "faible",
+        "flagged": false,
+        "first_alert": null,
+        "reasons": [],
+        "action": "Aucune action recommandée.",
+        "moments": []
+      },
+      "segments": [
+        {
+          "start": 0.0,
+          "end": 3.0,
+          "text": "Critique ciné",
+          "ocr_conf": 95.5,
+          "source": "ecran",
+          "score": 0.124,
+          "flagged": false,
+          "too_short": false
+        },
+        {
+          "start": 0.0,
+          "end": 3.16,
+          "text": "Ce film était vraiment nul, je ne vous le conseille pas.",
+          "source": "parole",
+          "score": 0.415,
+          "flagged": false,
+          "too_short": false
+        }
+      ],
+      "timings": {
+        "audio": 0.19,
+        "transcription": 1.22,
+        "images": 0.12,
+        "ocr": 0.13,
+        "classification": 0.05,
+        "fusion": 0.0,
+        "total": 1.71
+      }
+    }
+  },
+  {
+    "id": "exclusion",
+    "title": "Une exclusion formulée calmement (cas difficile)",
+    "note": "Sans insulte ni agressivité, le système a du mal à reconnaître ce type de harcèlement. C'est une limite connue, et c'est pour ça qu'un humain garde toujours la décision.",
+    "video": "videos/exclusion.mp4",
+    "result": {
+      "video": "exclusion.mp4",
+      "has_audio": true,
+      "n_frames": 4,
+      "n_ocr": 1,
+      "risk": {
+        "score": 0.365,
+        "level": "faible",
+        "flagged": false,
+        "first_alert": null,
+        "reasons": [],
+        "action": "Aucune action recommandée.",
+        "moments": []
+      },
+      "segments": [
+        {
+          "start": 0.0,
+          "end": 4.0,
+          "text": "Bonne soirée",
+          "ocr_conf": 96.0,
+          "source": "ecran",
+          "score": 0.042,
+          "flagged": false,
+          "too_short": false
+        },
+        {
+          "start": 0.0,
+          "end": 4.0,
+          "text": "On a tout décidé de ne plus te parler, tu n'es plus invité nulle part.",
+          "source": "parole",
+          "score": 0.365,
+          "flagged": false,
+          "too_short": false
+        }
+      ],
+      "timings": {
+        "audio": 0.17,
+        "transcription": 1.26,
+        "images": 0.12,
+        "ocr": 0.14,
+        "classification": 0.04,
+        "fusion": 0.0,
+        "total": 1.73
+      }
+    }
+  }
+]

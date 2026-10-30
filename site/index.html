@@ -41,6 +41,9 @@
   label { display: block; font-weight: 600; margin: 0 0 6px; }
   .level { font-size: 1.35rem; font-weight: 700; margin: 0 0 2px; }
   .level.élevé { color: var(--high); } .level.modéré { color: var(--mid); } .level.faible { color: var(--low); }
+  .level.neutre { color: var(--text); }
+  .warning { border-left: 4px solid var(--mid); background: var(--surface); border-radius: 8px;
+             padding: 12px 16px; margin: 0 0 16px; }
   .muted { color: var(--muted); font-size: .92rem; }
   ul.reasons { padding-left: 18px; margin: 4px 0 12px; }
   details { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
@@ -110,6 +113,9 @@
 
   <!-- Onglet 2 : tester une phrase, calcul entièrement dans le navigateur -->
   <section class="panel" id="tab-phrase" role="tabpanel" hidden>
+    <div class="warning"><strong>Prototype limité.</strong> Ce modèle a appris à partir d'environ 3 800 phrases,
+       surtout des insultes. Il ne reconnaît pas de façon fiable les menaces, les incitations à se faire du mal
+       ni les formulations indirectes. <strong>Un score bas ne veut pas dire qu'un message est sans danger.</strong></div>
     <p>Écrivez une phrase comme si elle était dite dans une vidéo. Le système donne un score de 0 à 1.
        <strong>N'écrivez aucune information personnelle.</strong></p>
     <label for="phrase">Votre phrase</label>
@@ -121,12 +127,13 @@
       <p class="muted" id="ph-meaning"></p>
       <p class="muted" id="ph-short" hidden>Phrase de moins de 3 mots : trop courte pour déclencher une alerte
          à elle seule, car sans contexte le système se trompe facilement.</p>
+      <p class="muted">Si cette phrase vous concerne, ou concerne un proche : 3114 (gratuit, 24 h/24, 7 j/7).
+         En cas de danger immédiat : 15 ou 112.</p>
     </div>
     <p class="muted" style="margin-top:16px">Le calcul se fait <strong>dans votre navigateur</strong> : votre phrase
        n'est envoyée nulle part. À la première analyse, le navigateur télécharge le modèle de langage depuis
-       Hugging Face (un peu plus de 100 Mo), puis le garde en mémoire. Ce modèle a été entraîné à reconnaître le
-       harcèlement : une phrase isolée, sans le reste de la vidéo, peut être mal jugée, et c'est pour ça qu'un
-       humain décide.</p>
+       Hugging Face (un peu plus de 100 Mo), puis le garde en mémoire. Une phrase isolée, sans le reste de la
+       vidéo, peut être mal jugée : c'est pour ça qu'un humain décide.</p>
 
     <!-- Vérification (visible avec #verif dans l'adresse) : compare le navigateur aux scores calculés en Python -->
     <div class="card" id="verif" hidden style="margin-top:20px">
@@ -152,6 +159,10 @@
       <li><strong>Orienter vers l'aide.</strong> Quand un risque est confirmé, l'action proposée est d'orienter la
           personne vers une aide (ici le 3018, numéro contre le harcèlement), plutôt que de simplement bloquer.</li>
     </ol>
+    <p><strong>Ses limites.</strong> Ce prototype a été entraîné sur un petit jeu de phrases, surtout des insultes.
+       Il manque d'entraînement : il repère mal le harcèlement sans insulte, les menaces et les incitations à se
+       faire du mal. Pour un vrai déploiement, il faudrait des données annotées par des professionnels, dans un
+       cadre encadré. C'est aussi pour ça qu'il ne décide jamais seul.</p>
     <p>Code, méthode, résultats et limites :
        <a href="https://github.com/LeCroco404/Garde-Fil">dépôt GitHub du projet</a>.</p>
   </section>
@@ -170,6 +181,14 @@ const LEVELS = {
   "modéré": ["🟠 Risque modéré", "La vidéo serait montrée à un modérateur humain."],
   "faible": ["🟢 Risque faible", "La vidéo ne serait pas montrée au modérateur."],
 };
+// Test de phrase : libellés prudents. Un score bas n'est jamais présenté comme une absence de danger.
+const PHRASE_LEVELS = {
+  "élevé":  ["🔴 Harcèlement probable", "Une vidéo contenant cette phrase serait montrée en priorité à un modérateur humain."],
+  "modéré": ["🟠 Harcèlement possible", "Une vidéo contenant cette phrase serait montrée à un modérateur humain."],
+  "faible": ["Score bas", "Le modèle n'a pas reconnu de harcèlement dans cette phrase. Cela ne veut pas dire " +
+             "qu'elle est sans danger : ce prototype ne reconnaît pas de façon fiable les menaces, les incitations " +
+             "à se faire du mal ou les formulations indirectes."],
+};
 const SOURCES = { parole: "🗣️ dit", ecran: "🖥️ écrit à l'écran", image: "🖼️ image" };
 const $ = (id) => document.getElementById(id);
 // Tout le texte est inséré avec textContent (jamais innerHTML) : aucun risque d'injection de code
@@ -177,10 +196,11 @@ const el = (tag, text) => { const e = document.createElement(tag); if (text !== 
 const fmtTs = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 const fmt = (x) => x.toFixed(2);
 
-function showLevel(prefix, level, score) {
-  const [label, meaning] = LEVELS[level];
+function showLevel(prefix, level, score, labels = LEVELS) {
+  const [label, meaning] = labels[level];
   $(`${prefix}-level`).textContent = `${label} · score ${fmt(score)}`;
-  $(`${prefix}-level`).className = `level ${level}`;
+  // Pas de couleur verte pour un score bas sur une phrase : rien ne doit suggérer « sans danger »
+  $(`${prefix}-level`).className = `level ${labels === PHRASE_LEVELS && level === "faible" ? "neutre" : level}`;
   $(`${prefix}-meaning`).textContent = meaning;
 }
 
@@ -260,7 +280,7 @@ $("analyze").addEventListener("click", async () => {
   try {
     const score = await scoreText(text);
     const [level, tooShort] = levelOf(text, score);
-    showLevel("ph", level, score);
+    showLevel("ph", level, score, PHRASE_LEVELS);
     $("ph-short").hidden = !tooShort;
     $("phrase-result").hidden = false;
     $("status").textContent = "";

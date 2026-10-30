@@ -150,6 +150,8 @@ La démo publique fonctionne sans serveur. Les exemples sont analysés à l'avan
 
 ## Limites
 
+Le modèle de texte manque d'entraînement. Il a appris à partir d'environ 3 800 phrases d'un jeu public de toxicité, surtout des insultes. Il ne reconnaît pas de façon fiable les menaces, les incitations à se faire du mal ni les formulations indirectes : un test sur la démo a donné un score de 0,07 à une incitation à se faire du mal formulée sans insulte. Un score bas ne signifie donc jamais qu'un message est sans danger, et la démo l'indique. La correction passe par des données annotées et encadrées, pas par une liste de mots.
+
 L'exclusion calme reste mal détectée (2 cas sur 3 manqués). Le modèle confond parfois négativité et toxicité (« cette journée est horrible », 0,50). L'image ne comprend pas le contexte. Le jeu de test est synthétique (voix de synthèse, fonds unis), sans vraies vidéos, ni musique, ni montage rapide. Le tableau de bord n'a pas d'authentification et n'est prévu que pour un usage local. Le classifieur est entraîné sur un sujet voisin : rien ne garantit ses performances sur le vrai sujet sans données adaptées.
 
 ## Éthique, RGPD et transposition

@@ -31,6 +31,15 @@ LEVEL_DISPLAY = {
     "modéré": ("🟠", "Risque modéré", "La vidéo serait montrée à un modérateur humain."),
     "faible": ("🟢", "Risque faible", "La vidéo ne serait pas montrée au modérateur."),
 }
+# Test de phrase : libellés prudents. Un score bas n'est jamais présenté comme une absence de danger.
+PHRASE_DISPLAY = {
+    "élevé": ("🔴", "Harcèlement probable",
+              "Une vidéo contenant cette phrase serait montrée en priorité à un modérateur humain."),
+    "modéré": ("🟠", "Harcèlement possible", "Une vidéo contenant cette phrase serait montrée à un modérateur humain."),
+    "faible": ("", "Score bas", "Le modèle n'a pas reconnu de harcèlement dans cette phrase. Cela ne veut pas dire "
+               "qu'elle est sans danger : ce prototype ne reconnaît pas de façon fiable les menaces, les incitations "
+               "à se faire du mal ou les formulations indirectes."),
+}
 SOURCE_DISPLAY = {"parole": "🗣️ dit", "ecran": "🖥️ écrit à l'écran", "image": "🖼️ image"}
 
 st.set_page_config(page_title="Garde-Fil, démo", page_icon="🛡️", layout="wide")
@@ -65,9 +74,9 @@ def score_sentence(text: str) -> tuple[float, str, bool]:
     return score, level, too_short
 
 
-def level_banner(level: str, score: float) -> None:
-    icon, label, meaning = LEVEL_DISPLAY[level]
-    st.subheader(f"{icon} {label} · score {score:.2f}")
+def level_banner(level: str, score: float, display: dict = LEVEL_DISPLAY) -> None:
+    icon, label, meaning = display[level]
+    st.subheader(f"{icon} {label} · score {score:.2f}".strip())
     st.caption(meaning)
 
 
@@ -127,6 +136,11 @@ with tab_videos:
 # ---------- Onglet 2 : tester une phrase ----------
 
 with tab_phrase:
+    st.warning(
+        "**Prototype limité.** Ce modèle a appris à partir d'environ 3 800 phrases, surtout des insultes. "
+        "Il ne reconnaît pas de façon fiable les menaces, les incitations à se faire du mal ni les formulations "
+        "indirectes. **Un score bas ne veut pas dire qu'un message est sans danger.**"
+    )
     st.markdown(
         "Écrivez une phrase comme si elle était dite dans une vidéo. Le système donne un score de 0 à 1. "
         "**N'écrivez aucune information personnelle** (nom, adresse…). Rien n'est enregistré."
@@ -139,14 +153,13 @@ with tab_phrase:
         else:
             with st.spinner("Analyse… (la première fois, le modèle se charge : quelques secondes)"):
                 score, level, too_short = score_sentence(text.strip())
-            level_banner(level, score)
+            level_banner(level, score, PHRASE_DISPLAY)
             if too_short:
                 st.caption("Phrase de moins de 3 mots : trop courte pour déclencher une alerte à elle seule, "
                            "car sans contexte le système se trompe facilement.")
-    st.caption(
-        "Ce modèle a été entraîné à reconnaître le harcèlement, à partir de phrases écrites. "
-        "Une phrase isolée, sans le reste de la vidéo, peut être mal jugée : c'est pour ça qu'un humain décide."
-    )
+            st.caption("Si cette phrase vous concerne, ou concerne un proche : 3114 (gratuit, 24 h/24, 7 j/7). "
+                       "En cas de danger immédiat : 15 ou 112.")
+    st.caption("Une phrase isolée, sans le reste de la vidéo, peut être mal jugée : c'est pour ça qu'un humain décide.")
 
 # ---------- Onglet 3 : explication ----------
 
@@ -161,6 +174,12 @@ with tab_how:
         "aident le système à s'améliorer, avec des garde-fous.\n"
         "5. **Orienter vers l'aide.** Quand un risque est confirmé, l'action proposée est d'orienter la personne "
         "vers une aide (ici le 3018, numéro contre le harcèlement), plutôt que de simplement bloquer."
+    )
+    st.markdown(
+        "**Ses limites.** Ce prototype a été entraîné sur un petit jeu de phrases, surtout des insultes. "
+        "Il manque d'entraînement : il repère mal le harcèlement sans insulte, les menaces et les incitations "
+        "à se faire du mal. Pour un vrai déploiement, il faudrait des données annotées par des professionnels, "
+        "dans un cadre encadré. C'est aussi pour ça qu'il ne décide jamais seul."
     )
     st.markdown(f"Code, méthode, résultats et limites : [dépôt GitHub du projet]({REPO_URL}).")
 

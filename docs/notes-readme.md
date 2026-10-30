@@ -52,3 +52,10 @@ Constats chiffrés relevés pendant le développement. Chaque phase ajoute les s
 7. Généralisation des corrections du modérateur, sur des formulations d'exclusion jamais vues : +0,03 à +0,10 ; un cas (cantine) franchit le seuil uniquement grâce à la correction (0,43 → 0,53). Aucun effet collatéral sur la prévention (±0,04).
 8. Limites restantes, documentées : exclusion calme mal couverte (2/3 manqués, problème de données, pas de seuil) ; négativité confondue avec la toxicité (« cette journée est horrible », 0,50) ; boxe signalée par l'image (plafonnée à MODÉRÉ) ; jeu petit et synthétique, calibré et mesuré sur les mêmes cas, donc chiffres indicatifs.
 9. Bonus de fusion rendus proportionnels (part de la marge restante) : plus de saturation à 1,00 (0,94 + convergence = 0,97).
+
+## Démo publique
+
+1. Hébergement : Hugging Face a rendu payants les Spaces Docker sur le matériel gratuit (refus « 402 Payment Required »). Choix d'une page statique sur GitHub Pages : gratuite, sans serveur, sans mise en veille.
+2. Aucune vidéo envoyée par les visiteurs : pas de données personnelles reçues, pas de point de collecte de contenus dangereux. Huit vidéos synthétiques analysées à l'avance (photos réelles exclues : licences des banques d'images).
+3. Test de phrase exécuté dans le navigateur (Transformers.js, modèle compressé en 8 bits) : la phrase ne quitte pas l'ordinateur du visiteur. Vérification contre Python : écart maximal 0,04, même décision sur 22/22 phrases de référence.
+4. Modèle exporté en JSON (coefficients) plutôt qu'en pickle : charger un pickle revient à exécuter du code.

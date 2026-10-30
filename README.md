@@ -4,7 +4,9 @@ Prototype d'aide à la modération de vidéos courtes (format TikTok). Garde-Fil
 
 Le projet vise à terme les contenus liés à l'automutilation et au suicide. Pour des raisons éthiques et légales, il est développé et évalué sur un sujet voisin, le harcèlement en ligne, avec des données publiques et des vidéos de test synthétiques. La méthode de transposition au vrai sujet est décrite dans [docs/ethique-rgpd.md](docs/ethique-rgpd.md).
 
-> Si toi ou un proche traversez une période difficile, le 3114 (numéro national de prévention du suicide) est gratuit et joignable 24 h/24, 7 j/7.
+**Démo en ligne : [lecroco404.github.io/Garde-Fil](https://lecroco404.github.io/Garde-Fil/)**. Huit vidéos synthétiques analysées à l'avance, et un champ pour tester une phrase, analysée directement dans votre navigateur : rien n'est envoyé ni enregistré.
+
+> Si vous traversez une période difficile, ou si un proche est concerné, le 3114 (numéro national de prévention du suicide) est gratuit et joignable 24 h/24, 7 j/7.
 
 ## Principes
 
@@ -101,6 +103,10 @@ python scripts/retrain_with_feedback.py
 
 # 6. Évaluation de bout en bout sur le jeu de test vidéo
 python scripts/build_eval_videos.py && python scripts/evaluate.py
+
+# 7. Démo publique : exemples pré-analysés, puis page statique (publiée par GitHub Actions)
+python scripts/build_demo.py && python scripts/build_site.py
+streamlit run app/demo.py                     # même démo, en local
 ```
 
 ## Résultats
@@ -140,6 +146,8 @@ L'image détecte le contenu, pas l'intention. CLIP signale une dispute (0,91) ma
 
 Le profilage a déplacé l'effort d'optimisation. 66 % du temps de la première analyse venait du chargement à froid des modèles, pas du calcul. Après préchargement, la première vidéo passe de 7,9 s à 3,05 s, avec des résultats identiques. Le benchmark Whisper a conduit à garder `small` (RTF 0,27) plutôt que `base` (RTF 0,11), qui transcrivait « ferme-la et dégage » en « ferme l'aédégage » et perdait le mot le plus agressif.
 
+La démo publique fonctionne sans serveur. Les exemples sont analysés à l'avance, et le test de phrase fait tourner le modèle de texte dans le navigateur du visiteur (Transformers.js), dans une version compressée en 8 bits, environ quatre fois plus légère. Comparée au modèle Python, elle donne un écart de score maximal de 0,04 et la même décision sur les 22 phrases de référence. La démo n'accepte aucune vidéo envoyée par un visiteur : elle ne peut ni recevoir de données personnelles, ni servir à collecter des contenus dangereux.
+
 ## Limites
 
 L'exclusion calme reste mal détectée (2 cas sur 3 manqués). Le modèle confond parfois négativité et toxicité (« cette journée est horrible », 0,50). L'image ne comprend pas le contexte. Le jeu de test est synthétique (voix de synthèse, fonds unis), sans vraies vidéos, ni musique, ni montage rapide. Le tableau de bord n'a pas d'authentification et n'est prévu que pour un usage local. Le classifieur est entraîné sur un sujet voisin : rien ne garantit ses performances sur le vrai sujet sans données adaptées.
@@ -152,6 +160,9 @@ Aucun contenu d'automutilation n'a été collecté pour ce projet. Les données 
 
 ```
 app/dashboard.py          tableau de bord du modérateur
+app/demo.py               démo en lecture seule (Streamlit, usage local)
+site/                     démo statique publiée sur GitHub Pages
+demo/                     vidéos synthétiques et résultats de la démo
 src/                      pipeline : extract, transcribe, ocr, vision, text_classifier, fusion, feedback, config
 scripts/                  entraînement, réapprentissage, évaluation, génération de vidéos, benchmark
 eval/cases.yaml           jeu de test vidéo synthétique (23 cas, versionné)

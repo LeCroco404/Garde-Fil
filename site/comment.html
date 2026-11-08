@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; media-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="no-referrer">
+<title>Comment ça marche, Garde-Fil</title>
+<meta name="description" content="Les étapes de l'analyse de Garde-Fil, les résultats de son évaluation et ses limites.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/composants.css">
+</head>
+<body>
+<a class="lien-evitement" href="#contenu">Aller au contenu</a>
+<header class="entete-site">
+  <div class="conteneur entete-site__interieur">
+    <a class="marque" href="./"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path d="M16 3 5.5 7v8.2c0 6.6 4.4 11.6 10.5 13.8 6.1-2.2 10.5-7.2 10.5-13.8V7L16 3Z" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><path d="M10 16.5h12" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg><span>Garde-Fil</span></a>
+    <nav aria-label="Navigation principale">
+      <ul>
+        <li><a href="videos.html">Vidéos d'exemple</a></li>
+        <li><a href="phrase.html">Tester une phrase</a></li>
+        <li><a href="comment.html" aria-current="page">Comment ça marche</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="contenu" tabindex="-1">
+  <div class="bandeau">
+    <div class="conteneur">
+    <h1>Comment ça marche</h1>
+    <p class="chapeau">Ce que fait Garde-Fil, comment il a été évalué, et ce qu'il ne sait pas faire.</p>
+    </div>
+  </div>
+  <div class="conteneur disposition">
+    <div>
+      <section aria-labelledby="etapes-titre">
+        <h2 id="etapes-titre">Les étapes de l'analyse</h2>
+        <ol class="etapes">
+          <li><strong>Écouter et lire.</strong> Le système transcrit la parole et lit le texte affiché à l'écran, une image par seconde.</li>
+          <li><strong>Comprendre le sens.</strong> Chaque phrase est transformée en une représentation de son sens, puis comparée à des milliers d'exemples. Il n'y a pas de liste de mots interdits : « ce film est nul » n'est pas du harcèlement, une vidéo de prévention non plus.</li>
+          <li><strong>Regrouper et expliquer.</strong> Les passages inquiétants proches dans le temps sont regroupés. Le système indique quoi, où et quand : « passage dit et affiché à l'écran à 0:02 ».</li>
+          <li><strong>Laisser décider un humain.</strong> Le modérateur confirme ou corrige. Ses corrections aident le système à s'améliorer, avec des garde-fous : une correction isolée ne peut pas renverser le modèle.</li>
+          <li><strong>Orienter vers l'aide.</strong> Quand un risque est confirmé, l'action proposée est d'orienter la personne vers une aide (ici le 3018, numéro contre le harcèlement), plutôt que de simplement bloquer.</li>
+        </ol>
+      </section>
+
+      <section aria-labelledby="resultats-titre">
+        <h2 id="resultats-titre">Résultats de l'évaluation</h2>
+        <p>Mesurés sur 23 vidéos synthétiques, avec un seuil d'alerte de 0,50. Ces chiffres sont indicatifs : le jeu de test est petit, et les réglages ont été choisis sur ces mêmes vidéos.</p>
+        <div class="tableau-defilant">
+          <table>
+            <caption class="sr-only">Résultats par catégorie de vidéo</caption>
+            <thead><tr><th scope="col">Catégorie de vidéo</th><th scope="col">Attendu</th><th scope="col" class="nombre">Bien traitées</th></tr></thead>
+            <tbody>
+              <tr><td>Contenus du quotidien</td><td>Non signalées</td><td class="nombre">5 sur 5</td></tr>
+              <tr><td>Vocabulaire négatif sans cible (« ce film était nul »)</td><td>Non signalées</td><td class="nombre">1 sur 2</td></tr>
+              <tr><td>Harcèlement explicite, dit ou écrit</td><td>Signalées</td><td class="nombre">5 sur 5</td></tr>
+              <tr><td>Exclusion formulée calmement</td><td>Signalées</td><td class="nombre">1 sur 3</td></tr>
+              <tr><td>Prévention, information, témoignage</td><td>Non signalées</td><td class="nombre">5 sur 5</td></tr>
+              <tr><td>Images : repas, dispute, match de boxe</td><td>Selon l'image</td><td class="nombre">2 sur 3</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Au total : précision de 0,78 et rappel de 0,78. Aucune vidéo de prévention n'a été signalée à tort.</p>
+      </section>
+
+      <section aria-labelledby="limites-titre">
+        <h2 id="limites-titre">Les limites</h2>
+        <p>Le modèle de texte manque d'entraînement. Il a appris à partir d'environ 3 800 phrases d'un jeu public, surtout des insultes. Il repère mal le harcèlement sans insulte, les menaces et les incitations à se faire du mal : un score bas ne signifie jamais qu'un message est sans danger.</p>
+        <p>L'analyse d'image reconnaît une scène, pas son contexte : un match de boxe ressemble à une bagarre. Seule, elle ne peut donc pas déclencher une revue prioritaire.</p>
+        <p>Les vidéos de test sont synthétiques : voix de synthèse et fond uni, sans musique ni montage rapide. Pour un vrai déploiement, il faudrait des données annotées par des professionnels, dans un cadre encadré.</p>
+      </section>
+    </div>
+
+    <aside aria-labelledby="bref-titre">
+      <h2 id="bref-titre">En bref</h2>
+      <ul class="liste-verifs">
+        <li>Le système signale et explique, un humain décide.</li>
+        <li>Il juge le sens des phrases, sans liste de mots interdits.</li>
+        <li>La prévention et les témoignages ne doivent pas être signalés.</li>
+        <li>Tout tourne en local : aucune vidéo n'est envoyée à un service externe.</li>
+      </ul>
+      <h2>Pour aller plus loin</h2>
+      <p class="sources">Méthode, évaluation détaillée, éthique et RGPD : <a href="https://github.com/LeCroco404/Garde-Fil">dépôt GitHub du projet</a>.</p>
+    </aside>
+  </div>
+</main>
+<footer class="pied-site">
+  <div class="conteneur pied-site__interieur">
+    <div>
+      <p><strong>Garde-Fil</strong>, prototype de démonstration d'aide à la modération.</p>
+      <p>Vidéos fabriquées pour l'exemple. Aucune donnée envoyée ni enregistrée, aucun cookie.</p>
+      <p><a href="https://github.com/LeCroco404/Garde-Fil">Code source et documentation sur GitHub</a></p>
+    </div>
+    <div>
+      <p><strong>Besoin d'aide ?</strong></p>
+      <ul>
+        <li><a href="tel:3114">3114</a> : prévention du suicide, 24 h/24</li>
+        <li><a href="tel:3018">3018</a> : harcèlement en ligne</li>
+        <li><a href="tel:15">15</a> ou <a href="tel:112">112</a> : urgence</li>
+      </ul>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

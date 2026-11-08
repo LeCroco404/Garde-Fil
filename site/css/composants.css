@@ -1,0 +1,274 @@
+/*
+ * Composants réutilisés par toutes les pages.
+ * Repris du système graphique de Garde-Mail ; seuls les composants propres à Garde-Fil sont ajoutés
+ * (lecteur vidéo, liste déroulante, zone de texte non technique, décision du modérateur).
+ */
+
+/* L'attribut hidden doit l'emporter même sur un composant en display: grid ou flex */
+[hidden] { display: none !important; }
+
+.aide { color: var(--texte-doux); font-size: 0.95rem; margin: 0.3rem 0 0.6rem; }
+
+.alerte {
+  background: var(--ambre-fond);
+  color: var(--texte);
+  border: 1px solid var(--ambre);
+  border-radius: var(--rayon);
+  padding: 0.8rem 1rem;
+}
+.alerte p { margin: 0; }
+
+/* ------------------------------------------------------------------ */
+/* Formulaires                                                         */
+/* ------------------------------------------------------------------ */
+
+.formulaire { margin-top: 1.75rem; }
+.champ label { display: block; font-weight: 700; font-size: 1.05rem; }
+.champ textarea,
+.champ input,
+.champ select {
+  display: block;
+  width: 100%;
+  border: 1.5px solid var(--bordure);
+  border-radius: var(--rayon);
+  background: var(--fond);
+  color: var(--texte);
+}
+/* Zone de texte qui reçoit du contenu technique : monospace */
+.champ textarea {
+  min-height: 15rem;
+  padding: 0.85rem 1rem;
+  font-family: var(--police-code);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+/* Zone de texte qui reçoit une phrase ordinaire : police du site, hauteur réduite */
+.champ--texte textarea {
+  min-height: 7rem;
+  font-family: var(--police);
+  font-size: 1.0625rem;
+  line-height: 1.5;
+}
+.champ input,
+.champ select { min-height: 48px; padding: 0.5rem 0.85rem; font: inherit; }
+.champ select { max-width: 40rem; }
+
+.boutons { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.9rem; }
+
+.bouton {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0.55rem 1.3rem;
+  border: 2px solid var(--accent);
+  border-radius: var(--rayon);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.bouton--principal { background: var(--accent); color: var(--accent-texte); }
+.bouton--principal:hover { box-shadow: inset 0 0 0 2px var(--accent-texte); }
+.bouton--secondaire { background: transparent; color: var(--accent); }
+.bouton--secondaire:hover { background: var(--bleu-fond); }
+.bouton:disabled { opacity: 0.55; cursor: wait; }
+
+/* ------------------------------------------------------------------ */
+/* Verdict : le tampon                                                 */
+/* ------------------------------------------------------------------ */
+
+.resultat:empty { display: none; }
+.resultat { overflow-x: clip; container-type: inline-size; } /* le tampon agrandi pendant sa pose ne crée pas de défilement horizontal */
+.resultat > h2 { margin-top: 2.25rem; }
+
+.verdict {
+  display: grid;
+  gap: 0.75rem 1.75rem;
+  align-items: center;
+  padding: 1.5rem clamp(1rem, 3vw, 1.75rem);
+  border-radius: var(--rayon);
+  color: var(--texte);
+  --encre: var(--accent);
+  background: var(--bleu-fond);
+}
+/* Tampon et explication côte à côte seulement si la zone de résultat est assez large (colonne étroite des vidéos) */
+@container (min-width: 36rem) {
+  .verdict { grid-template-columns: auto minmax(0, 1fr); }
+}
+.verdict > div p { margin: 0 0 0.6rem; }
+.verdict > div p:last-child { margin-bottom: 0; }
+
+/* Le tampon encré : double filet, légèrement penché, posé une seule fois */
+.tampon {
+  justify-self: start;
+  margin: 0.35rem 0.5rem 0.35rem 0.25rem;
+  padding: 0.45rem 0.9rem;
+  border: 3px solid var(--encre);
+  outline: 1.5px solid var(--encre);
+  outline-offset: 3px;
+  border-radius: 6px;
+  color: var(--encre);
+  font-weight: 800;
+  font-size: clamp(1.2rem, 2.6vw, 1.55rem);
+  line-height: 1.1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transform: rotate(-4deg);
+  animation: apposer 260ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+@keyframes apposer {
+  from { transform: rotate(-12deg) scale(1.5); opacity: 0; }
+  to { transform: rotate(-4deg) scale(1); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tampon { animation: none; }
+}
+/* Très petits écrans (320 px) : le tampon peut passer sur deux lignes */
+@media (max-width: 24rem) {
+  .tampon { white-space: normal; max-width: calc(100% - 2rem); font-size: 1.15rem; } /* marge pour la rotation */
+}
+
+/* États de Garde-Fil. Un niveau faible reste en bleu neutre : rien ne doit suggérer « sans danger ». */
+.verdict--eleve { --encre: var(--rouge); background: var(--rouge-fond); }
+.verdict--modere { --encre: var(--ambre); background: var(--ambre-fond); }
+.verdict--faible { --encre: var(--accent); background: var(--bleu-fond); }
+
+.verdict__raison { color: var(--texte-doux); }
+
+.score { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 1rem; font-weight: 700; }
+.score meter { width: 14rem; max-width: 100%; height: 1rem; }
+/* Jauge à la couleur du verdict : jamais de vert, un score bas ne veut pas dire « sans danger » */
+.score meter { -webkit-appearance: none; appearance: none; background: var(--fond); border: 1px solid var(--bordure); }
+.score meter::-webkit-meter-bar { background: var(--fond); border: none; border-radius: 0; height: 100%; }
+.score meter::-webkit-meter-optimum-value,
+.score meter::-webkit-meter-suboptimum-value,
+.score meter::-webkit-meter-even-less-good-value { background: var(--encre); border-radius: 0; }
+.score meter::-moz-meter-bar { background: var(--encre); }
+
+/* ------------------------------------------------------------------ */
+/* Listes de vérifications et de signaux                               */
+/* ------------------------------------------------------------------ */
+
+.liste-verifs, .liste-signaux { list-style: none; margin: 0; padding: 0; }
+.liste-verifs li, .liste-signaux li {
+  max-width: none;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--filet);
+}
+.liste-verifs li:first-child, .liste-signaux li:first-child { border-top: 1px solid var(--filet); }
+
+/* Signal : colonne fixe pour le libellé, texte à côté */
+.signal { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: 0.25rem 1rem; align-items: baseline; }
+.signal p { margin: 0; }
+@media (max-width: 30rem) {
+  .signal { grid-template-columns: 1fr; }
+}
+
+.badge { font-weight: 800; font-size: 0.95rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.badge--info { color: var(--accent); }
+.badge--attention { color: var(--ambre); }
+.badge--grave { color: var(--rouge); }
+
+.preuves { color: var(--texte-doux); }
+
+code { background: var(--surface); padding: 0.1rem 0.35rem; border-radius: 3px; overflow-wrap: anywhere; }
+
+.rappel { margin-top: 2rem; color: var(--texte-doux); font-size: 0.95rem; }
+
+/* ------------------------------------------------------------------ */
+/* Accordéons natifs (<details>), utilisables au clavier               */
+/* ------------------------------------------------------------------ */
+
+.accordeons { margin-top: 2rem; }
+.accordeons details { border-top: 1px solid var(--filet); }
+.accordeons details:last-of-type { border-bottom: 1px solid var(--filet); }
+.accordeons summary { cursor: pointer; font-weight: 700; padding: 0.8rem 0; }
+.accordeons details[open] { padding-bottom: 0.75rem; }
+.accordeons ol { padding-left: 1.3rem; margin: 0; }
+
+/* ------------------------------------------------------------------ */
+/* Contenus éditoriaux                                                  */
+/* ------------------------------------------------------------------ */
+
+.etapes { padding-left: 1.4rem; }
+.etapes li { margin-bottom: 0.65rem; padding-left: 0.25rem; }
+.etapes li::marker { font-weight: 800; color: var(--accent); }
+
+.sources { color: var(--texte-doux); font-size: 0.95rem; }
+
+/* ------------------------------------------------------------------ */
+/* Accueil                                                             */
+/* ------------------------------------------------------------------ */
+
+.modules { display: grid; gap: 0; margin-top: 2.5rem; }
+@media (min-width: 56rem) {
+  .modules { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .module + .module { border-left: 1px solid var(--filet); padding-left: 2rem; }
+  .module { padding-right: 2rem; }
+}
+.module { padding-block: 1.25rem; border-top: 1px solid var(--filet); }
+@media (min-width: 56rem) { .module { border-top: none; } }
+.module h2 { margin: 0 0 0.6rem; font-size: 1.45rem; }
+.module h2 a { color: var(--texte); text-decoration: none; }
+.module h2 a:hover { color: var(--accent); text-decoration: underline; }
+.module p { margin: 0 0 0.75rem; }
+.module .a-coller { color: var(--texte-doux); font-size: 0.98rem; }
+
+.urgence {
+  margin-top: 2.5rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  background: var(--rouge-fond);
+  border-radius: var(--rayon);
+  display: grid;
+  gap: 0.5rem 2rem;
+  align-items: center;
+}
+@media (min-width: 48rem) { .urgence { grid-template-columns: minmax(0, 1fr) auto; } }
+.urgence h2 { margin: 0 0 0.35rem; }
+.urgence p { margin: 0; }
+
+.deux-colonnes { display: grid; gap: 0 clamp(2rem, 5vw, 4.5rem); }
+@media (min-width: 56rem) { .deux-colonnes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ------------------------------------------------------------------ */
+/* Pages éditoriales                                                   */
+/* ------------------------------------------------------------------ */
+
+section[id] { scroll-margin-top: 1rem; }
+
+table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 1rem; }
+th, td { text-align: left; vertical-align: top; padding: 0.7rem 1rem 0.7rem 0; border-bottom: 1px solid var(--filet); }
+th { font-weight: 800; border-bottom: 2px solid var(--texte); }
+.tableau-defilant { overflow-x: auto; }
+/* Sans cela, la largeur minimale d'un tableau élargit la colonne et la page défile à 320 px */
+.disposition > * { min-width: 0; }
+th:last-child, td:last-child { padding-right: 0; }
+td.nombre, th.nombre { font-variant-numeric: tabular-nums; }
+td.nombre { white-space: nowrap; }
+
+/* ------------------------------------------------------------------ */
+/* Démo Garde-Fil : exemple vidéo et décision du modérateur            */
+/* ------------------------------------------------------------------ */
+
+/* Vidéo verticale à gauche, résultat à droite ; une seule colonne sur petit écran */
+.exemple { display: grid; gap: 1.5rem clamp(1.5rem, 3vw, 2.5rem); margin-top: 1.5rem; }
+@media (min-width: 48rem) {
+  .exemple { grid-template-columns: minmax(11rem, 17rem) minmax(0, 1fr); align-items: start; }
+}
+.lecteur video {
+  display: block;
+  width: 100%;
+  max-height: 70vh;
+  background: var(--texte);
+  border-radius: var(--rayon);
+}
+.lecteur p { font-size: 0.95rem; color: var(--texte-doux); margin: 0.6rem 0 0; }
+
+.exemple h2 { margin-top: 1.75rem; }
+
+.decision fieldset { border: none; padding: 0; margin: 0.25rem 0 0.5rem; }
+.decision legend { font-weight: 700; padding: 0; }
+.decision label { display: flex; align-items: center; gap: 0.6rem; min-height: 44px; }
+.decision input { width: 1.15rem; height: 1.15rem; accent-color: var(--accent); }

@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; media-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="no-referrer">
+<title>Vidéos d'exemple, Garde-Fil</title>
+<meta name="description" content="Huit vidéos synthétiques analysées à l'avance par Garde-Fil, avec les explications données au modérateur.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/composants.css">
+<script type="module" src="js/videos.js"></script>
+</head>
+<body>
+<a class="lien-evitement" href="#contenu">Aller au contenu</a>
+<header class="entete-site">
+  <div class="conteneur entete-site__interieur">
+    <a class="marque" href="./"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path d="M16 3 5.5 7v8.2c0 6.6 4.4 11.6 10.5 13.8 6.1-2.2 10.5-7.2 10.5-13.8V7L16 3Z" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><path d="M10 16.5h12" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg><span>Garde-Fil</span></a>
+    <nav aria-label="Navigation principale">
+      <ul>
+        <li><a href="videos.html" aria-current="page">Vidéos d'exemple</a></li>
+        <li><a href="phrase.html">Tester une phrase</a></li>
+        <li><a href="comment.html">Comment ça marche</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="contenu" tabindex="-1">
+  <div class="bandeau">
+    <div class="conteneur">
+    <h1>Vidéos d'exemple</h1>
+    <p class="chapeau">Huit vidéos fabriquées pour l'exemple et analysées à l'avance. Choisissez-en une pour voir ce que Garde-Fil signale, et ce qu'il explique au modérateur.</p>
+    </div>
+  </div>
+  <div class="conteneur disposition">
+    <div>
+      <div class="champ formulaire">
+        <label for="exemple">Choisissez un exemple</label>
+        <select id="exemple"></select>
+      </div>
+
+      <div class="exemple">
+        <div class="lecteur">
+          <video id="video" controls playsinline preload="metadata"></video>
+          <p id="description"></p>
+        </div>
+        <div>
+          <div class="resultat" id="verdict" aria-live="polite"></div>
+          <h2>À remarquer</h2>
+          <p id="note"></p>
+          <h2>Ce que le système explique au modérateur</h2>
+          <ul class="liste-verifs" id="raisons"></ul>
+          <p id="sans-raison" hidden>Aucun passage ne dépasse le seuil d'alerte : la vidéo ne serait pas montrée au modérateur.</p>
+          <h2>Action recommandée</h2>
+          <p id="action"></p>
+        </div>
+      </div>
+
+      <div class="accordeons">
+        <details>
+          <summary>Ce que le système a entendu et lu</summary>
+          <ul class="liste-signaux" id="segments"></ul>
+          <p class="aide">Score : de 0 (rien d'inquiétant) à 1 (très probablement du harcèlement). Un passage est signalé à partir de 0,50. La transcription automatique peut contenir des erreurs, visibles ici.</p>
+        </details>
+        <details class="decision">
+          <summary>Ce que verrait le modérateur pour décider</summary>
+          <fieldset disabled>
+            <legend>Décision sur la vidéo</legend>
+            <label><input type="radio" name="decision"> Risque confirmé</label>
+            <label><input type="radio" name="decision"> Pas de risque</label>
+            <label><input type="radio" name="decision"> Escalade (cas complexe)</label>
+          </fieldset>
+          <p class="aide">Dans l'outil réel, le modérateur choisit lui-même : aucune réponse n'est proposée par défaut, et il peut corriger le système. Désactivé dans la démo.</p>
+        </details>
+      </div>
+    </div>
+
+    <aside aria-labelledby="lire-titre">
+      <h2 id="lire-titre">Lire le résultat</h2>
+      <ul class="liste-signaux">
+        <li class="signal"><span class="badge badge--grave">Élevé</span><p>Revue prioritaire par un modérateur humain.</p></li>
+        <li class="signal"><span class="badge badge--attention">Modéré</span><p>Revue standard par un modérateur humain.</p></li>
+        <li class="signal"><span class="badge badge--info">Faible</span><p>La vidéo n'est pas montrée au modérateur. Cela ne prouve pas qu'elle est sans danger.</p></li>
+      </ul>
+      <h2>Le score</h2>
+      <p>Il va de 0 à 1. Un passage est signalé à partir de 0,50 ; une vidéo passe en revue prioritaire à partir de 0,75. Quand la parole et l'écran disent la même chose au même moment, le score monte.</p>
+      <p class="rappel">Toutes les vidéos sont synthétiques : voix de synthèse, fond uni, aucune personne réelle.</p>
+    </aside>
+  </div>
+</main>
+<footer class="pied-site">
+  <div class="conteneur pied-site__interieur">
+    <div>
+      <p><strong>Garde-Fil</strong>, prototype de démonstration d'aide à la modération.</p>
+      <p>Vidéos fabriquées pour l'exemple. Aucune donnée envoyée ni enregistrée, aucun cookie.</p>
+      <p><a href="https://github.com/LeCroco404/Garde-Fil">Code source et documentation sur GitHub</a></p>
+    </div>
+    <div>
+      <p><strong>Besoin d'aide ?</strong></p>
+      <ul>
+        <li><a href="tel:3114">3114</a> : prévention du suicide, 24 h/24</li>
+        <li><a href="tel:3018">3018</a> : harcèlement en ligne</li>
+        <li><a href="tel:15">15</a> ou <a href="tel:112">112</a> : urgence</li>
+      </ul>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

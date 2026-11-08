@@ -1,0 +1,225 @@
+/*
+ * Base commune : police, couleurs, typographie, mise en page, en-tête et pied de page.
+ * Univers visuel : le courrier. Trame des enveloppes de sécurité, encre de tampon.
+ * Contrastes vérifiés au niveau AA (4,5:1 pour le texte) en clair et en sombre.
+ */
+
+/* Police auto-hébergée (licence SIL OFL, voir polices/OFL.txt) : la CSP n'autorise que le site lui-même */
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../polices/atkinson-hyperlegible-next-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../polices/atkinson-hyperlegible-next-latin-700-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("../polices/atkinson-hyperlegible-next-latin-800-normal.woff2") format("woff2");
+}
+
+:root {
+  color-scheme: light dark;
+
+  /* Papier et encre */
+  --fond: #fcfcfe;
+  --bandeau: #eef1fa;
+  --surface: #f2f4fa;
+  --texte: #18233f;
+  --texte-doux: #4e5870;
+  --accent: #2c47b0;          /* bleu sécurité : liens, boutons, focus */
+  --accent-texte: #ffffff;
+  --trame: #c9d3ef;           /* motif des enveloppes de sécurité */
+  --filet: #d5dbea;
+  --bordure: #6d7690;
+
+  /* Encres des tampons */
+  --vert: #17663f;
+  --vert-fond: #e9f4ee;
+  --ambre: #8a5300;
+  --ambre-fond: #fdf3e2;
+  --rouge: #b3261e;
+  --rouge-fond: #fcecea;
+  --bleu-fond: #e9edf9;
+
+  --police: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --police-code: ui-monospace, Menlo, Consolas, monospace;
+  --largeur: 76rem;
+  --marge: clamp(1rem, 4vw, 3rem);
+  --rayon: 4px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fond: #121a30;
+    --bandeau: #18213b;
+    --surface: #1c2643;
+    --texte: #e7ebf5;
+    --texte-doux: #b3bccf;
+    --accent: #9db4ff;
+    --accent-texte: #121a30;
+    --trame: #2a3760;
+    --filet: #2c375a;
+    --bordure: #8d97b0;
+
+    --vert: #7fd6a6;
+    --vert-fond: #15302a;
+    --ambre: #f3c06d;
+    --ambre-fond: #33280f;
+    --rouge: #ff9b93;
+    --rouge-fond: #3b1a22;
+    --bleu-fond: #1f2a4d;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Base                                                                */
+/* ------------------------------------------------------------------ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--fond);
+  color: var(--texte);
+  font-family: var(--police);
+  font-size: 1.125rem;
+  line-height: 1.6;
+  -webkit-text-size-adjust: 100%;
+}
+@media (max-width: 40rem) {
+  body { font-size: 1.0625rem; }
+}
+
+h1, h2, h3 { line-height: 1.2; font-weight: 800; letter-spacing: -0.01em; }
+h1 { font-size: clamp(2.1rem, 5vw, 3.4rem); letter-spacing: -0.025em; margin: 0 0 1rem; max-width: 22ch; }
+h2 { font-size: clamp(1.4rem, 2.6vw, 1.75rem); margin: 2.75rem 0 0.85rem; }
+h3 { font-size: 1.15rem; font-weight: 700; margin: 1.75rem 0 0.5rem; }
+p, li { max-width: 72ch; }
+
+a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+a:hover { text-decoration-thickness: 2px; }
+
+code, pre { font-family: var(--police-code); font-size: 0.88em; }
+
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+main:focus { outline: none; }
+
+/* ------------------------------------------------------------------ */
+/* Mise en page                                                        */
+/* ------------------------------------------------------------------ */
+
+.conteneur {
+  max-width: var(--largeur);
+  margin-inline: auto;
+  padding-inline: var(--marge);
+}
+
+/* Bandeau d'ouverture de page : fond papier bleuté, bordé en bas par la trame d'enveloppe */
+.bandeau {
+  background: var(--bandeau);
+  padding-block: clamp(2rem, 5vw, 3.75rem) clamp(1.75rem, 4vw, 2.75rem);
+  position: relative;
+}
+.bandeau::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 12px;
+  background-image:
+    repeating-linear-gradient(45deg, var(--trame) 0 2px, transparent 2px 8px),
+    repeating-linear-gradient(-45deg, var(--trame) 0 2px, transparent 2px 8px);
+}
+.chapeau { font-size: clamp(1.15rem, 2vw, 1.3rem); max-width: 60ch; margin: 0; }
+.bandeau .confidentialite-courte { margin: 1.1rem 0 0; color: var(--texte-doux); font-size: 1rem; }
+
+/* Page d'outil : colonne principale + colonne latérale sur grand écran */
+.disposition {
+  display: grid;
+  gap: 0 clamp(2rem, 5vw, 4.5rem);
+  padding-block: 1rem 2rem;
+}
+@media (min-width: 62rem) {
+  .disposition { grid-template-columns: minmax(0, 1fr) 22rem; }
+  .disposition > aside { padding-top: 0.25rem; }
+}
+.disposition > aside h2:first-child { margin-top: 1.75rem; }
+
+/* ------------------------------------------------------------------ */
+/* En-tête et pied de page                                             */
+/* ------------------------------------------------------------------ */
+
+.lien-evitement {
+  position: absolute;
+  left: 1rem;
+  top: -10rem;
+  padding: 0.5rem 1rem;
+  background: var(--accent);
+  color: var(--accent-texte);
+  z-index: 10;
+}
+.lien-evitement:focus { top: 0.5rem; }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.entete-site { border-bottom: 1px solid var(--filet); background: var(--fond); }
+.entete-site__interieur {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 2rem;
+  padding-block: 0.9rem;
+}
+.marque {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: var(--texte);
+  text-decoration: none;
+}
+.marque svg { width: 1.75rem; height: 1.75rem; flex: none; }
+.entete-site ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.entete-site nav a { display: inline-block; padding: 0.3rem 0; color: var(--texte); text-decoration: none; font-weight: 700; font-size: 1rem; }
+.entete-site nav a:hover { color: var(--accent); }
+.entete-site nav a[aria-current="page"] { color: var(--accent); box-shadow: inset 0 -3px 0 var(--accent); }
+
+.pied-site {
+  margin-top: 3rem;
+  padding-block: 2.25rem 2.75rem;
+  background: var(--bandeau);
+  color: var(--texte-doux);
+  font-size: 1rem;
+}
+.pied-site__interieur { display: grid; gap: 1.25rem 3rem; }
+@media (min-width: 48rem) {
+  .pied-site__interieur { grid-template-columns: 1.4fr 1fr; }
+}
+.pied-site p { margin: 0 0 0.5rem; }
+.pied-site ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.35rem 1.25rem; }
+.marque svg { color: var(--accent); }

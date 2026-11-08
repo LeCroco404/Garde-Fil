@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self'; font-src 'self'; media-src 'self'; connect-src 'self' https://huggingface.co https://*.huggingface.co https://*.hf.co; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="no-referrer">
+<title>Tester une phrase, Garde-Fil</title>
+<meta name="description" content="Testez une phrase avec le modèle de langage de Garde-Fil, directement dans votre navigateur.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/composants.css">
+<script type="module" src="js/phrase.js"></script>
+</head>
+<body>
+<a class="lien-evitement" href="#contenu">Aller au contenu</a>
+<header class="entete-site">
+  <div class="conteneur entete-site__interieur">
+    <a class="marque" href="./"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path d="M16 3 5.5 7v8.2c0 6.6 4.4 11.6 10.5 13.8 6.1-2.2 10.5-7.2 10.5-13.8V7L16 3Z" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><path d="M10 16.5h12" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg><span>Garde-Fil</span></a>
+    <nav aria-label="Navigation principale">
+      <ul>
+        <li><a href="videos.html">Vidéos d'exemple</a></li>
+        <li><a href="phrase.html" aria-current="page">Tester une phrase</a></li>
+        <li><a href="comment.html">Comment ça marche</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="contenu" tabindex="-1">
+  <div class="bandeau">
+    <div class="conteneur">
+    <h1>Tester une phrase</h1>
+    <p class="chapeau">Écrivez une phrase comme si elle était dite dans une vidéo. Le modèle de langage lui donne un score de 0 à 1.</p>
+    <p class="confidentialite-courte">Le calcul se fait dans votre navigateur : votre phrase n'est envoyée nulle part.</p>
+    </div>
+  </div>
+  <div class="conteneur disposition">
+    <div>
+      <div class="alerte formulaire">
+        <p><strong>Prototype limité.</strong> Ce modèle a appris à partir d'environ 3 800 phrases, surtout des insultes. Il ne reconnaît pas de façon fiable les menaces, les incitations à se faire du mal ni les formulations indirectes. <strong>Un score bas ne veut pas dire qu'un message est sans danger.</strong></p>
+      </div>
+
+      <form class="formulaire" id="formulaire">
+        <div class="champ champ--texte">
+          <label for="phrase">Votre phrase</label>
+          <p class="aide" id="phrase-aide">300 caractères au maximum. N'écrivez aucune information personnelle (nom, adresse, numéro…).</p>
+          <textarea id="phrase" name="phrase" maxlength="300" required aria-describedby="phrase-aide"></textarea>
+        </div>
+        <div class="boutons">
+          <button class="bouton bouton--principal" type="submit" id="analyser">Analyser</button>
+          <button class="bouton bouton--secondaire" type="reset">Effacer</button>
+        </div>
+        <p class="aide" id="etat" aria-live="polite"></p>
+      </form>
+
+      <div class="resultat" id="resultat" aria-live="polite"></div>
+
+      <section id="verif" hidden aria-labelledby="verif-titre">
+        <h2 id="verif-titre">Vérification du modèle</h2>
+        <p>Compare les scores du modèle compressé, exécuté dans le navigateur, à ceux calculés en pleine précision en Python.</p>
+        <div class="boutons">
+          <button class="bouton bouton--secondaire" type="button" id="verif-lancer">Lancer la vérification</button>
+        </div>
+        <p id="verif-resume" aria-live="polite"></p>
+        <div class="tableau-defilant">
+          <table>
+            <caption class="sr-only">Scores de référence comparés aux scores du navigateur</caption>
+            <thead><tr><th scope="col">Phrase</th><th scope="col" class="nombre">Python</th><th scope="col" class="nombre">Navigateur</th><th scope="col" class="nombre">Écart</th></tr></thead>
+            <tbody id="verif-lignes"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <aside aria-labelledby="calcul-titre">
+      <h2 id="calcul-titre">Où se fait le calcul ?</h2>
+      <p>Dans votre navigateur. À la première analyse, il télécharge le modèle de langage depuis Hugging Face (un peu plus de 100 Mo), puis le garde en mémoire. Hugging Face voit ce téléchargement, jamais votre phrase.</p>
+      <h2>Pourquoi un score bas ne rassure pas</h2>
+      <p>Le modèle ne connaît que ce qu'il a vu pendant son entraînement. Une phrase sans insulte peut être blessante et obtenir un score bas. Une phrase seule, sans le reste de la vidéo, est aussi plus difficile à juger.</p>
+      <h2>Besoin d'aide ?</h2>
+      <p>Si une phrase ou une vidéo vous concerne, ou concerne un proche : <a href="tel:3114">3114</a>, gratuit, 24 h/24, 7 j/7. En cas de danger immédiat : <a href="tel:15">15</a> ou <a href="tel:112">112</a>.</p>
+    </aside>
+  </div>
+</main>
+<footer class="pied-site">
+  <div class="conteneur pied-site__interieur">
+    <div>
+      <p><strong>Garde-Fil</strong>, prototype de démonstration d'aide à la modération.</p>
+      <p>Vidéos fabriquées pour l'exemple. Aucune donnée envoyée ni enregistrée, aucun cookie.</p>
+      <p><a href="https://github.com/LeCroco404/Garde-Fil">Code source et documentation sur GitHub</a></p>
+    </div>
+    <div>
+      <p><strong>Besoin d'aide ?</strong></p>
+      <ul>
+        <li><a href="tel:3114">3114</a> : prévention du suicide, 24 h/24</li>
+        <li><a href="tel:3018">3018</a> : harcèlement en ligne</li>
+        <li><a href="tel:15">15</a> ou <a href="tel:112">112</a> : urgence</li>
+      </ul>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
